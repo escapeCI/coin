@@ -1,10 +1,20 @@
 package com.example.android.architecture.blueprints.todoapp.data;
 
 /**
- * Created by Shinyoung.Kim on 2017-06-25.
+ * Created by tinyhhj on 2017-06-25.
  */
 
 public class Exchange {
-    String name;
-    String URL;
+    private String mName;         // 거래소 이름 : 빗썸 , okcoin
+    private static String mUrl;          //  서버 url
+
+    public String getName() {
+        return mName;
+    }
+
+    public void setName(String name) {
+        this.mName = name;
+    }
+
+
 }

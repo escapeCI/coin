@@ -25,6 +25,7 @@ public class Coin {
     public String getName() { return mName; }
     public Exchange getExchange() { return mExchange; }
     public PriceInfo getPriceInfo() { return mPriceInfo; }
+    public void setPriceInfo(PriceInfo p) { mPriceInfo = p ;}
 
 
 }

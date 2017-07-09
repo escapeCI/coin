@@ -6,7 +6,20 @@ package com.example.android.architecture.blueprints.todoapp.data;
 
 public class Exchange {
     private String mName;         // 거래소 이름 : 빗썸 , okcoin
-    private static String mUrl;          //  서버 url
+    private String mUrl;          //  서버 url
+    private static final String serverIp = "abc";
+
+    public Exchange(String ExName)
+    {
+        this(ExName , serverIp );
+    }
+
+    public Exchange(String ExName , String url)
+    {
+        mName = ExName;
+        mUrl = url;
+    }
+
 
     public String getName() {
         return mName;

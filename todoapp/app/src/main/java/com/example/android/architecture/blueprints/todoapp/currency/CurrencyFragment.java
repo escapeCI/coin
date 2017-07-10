@@ -30,6 +30,9 @@ import java.util.List;
 public class CurrencyFragment extends Fragment implements CurrencyContract.View{
     private CurrencyContract.Presenter mPresenter;
     private CoinsAdapter mListAdapter;
+    private Thread refreshThread;
+    private final int refresh_period = 5000;    // 현재가 갱신 반복주기 (millisecond)
+
     public CurrencyFragment() {
 
 
@@ -51,7 +54,31 @@ public class CurrencyFragment extends Fragment implements CurrencyContract.View{
     public void onResume() {
         super.onResume();
         mPresenter.start();
+
+        /* 5초마다 현재가 갱신 */
+        refreshThread = new Thread(new Runnable(){
+           @Override
+            public void run(){
+               while(true){
+                   mPresenter.start();
+                   try {
+                       Thread.sleep(refresh_period);
+                   } catch (InterruptedException e) {
+                       e.printStackTrace();
+                   }
+               }
+
+           }
+        });
+        refreshThread.start();
         Toast.makeText(getActivity() , "CurrencyFragment onResume()",Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        /* 화면 stop상태에서 현재가 갱신 쓰레드 인터럽트 */
+        refreshThread.interrupt();
     }
 
     @Override
@@ -184,7 +211,7 @@ public class CurrencyFragment extends Fragment implements CurrencyContract.View{
 
             coinName.setText(coin.getName().toUpperCase());
             exchangeName.setText(coin.getExchange().getName());
-            curPrice.setText(String.valueOf(coin.getPriceInfo().getCurPrice()));
+            curPrice.setText(String.valueOf((int)coin.getPriceInfo().getCurPrice()));
 
             double diff = coin.getPriceInfo().getCurPrice() - coin.getPriceInfo().getAvgPrice24h();
             updown.setImageResource( (diff < 0) ? R.drawable.blue_triangle  : R.drawable.red_triangle );
@@ -195,7 +222,7 @@ public class CurrencyFragment extends Fragment implements CurrencyContract.View{
             double rate = (diff / coin.getPriceInfo().getAvgPrice24h()) * 100;
             rate = Double.parseDouble(String.format("%.2f", rate));
 
-            diffPrice.setText(String.valueOf(diff));
+            diffPrice.setText(String.valueOf((int)diff));
             diffRate.setText(String.valueOf(rate) + "%");
 
             //click listener

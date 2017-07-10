@@ -36,6 +36,9 @@ public class HttpConnection {
     private static final int READ_TIMEOUT = 3;
     private CoinsDataSource.LoadCoinsCallback mCallback;
 
+    //For priceInfo JSONObject Keys
+    public static final String CUR_PRICE = "last_price";
+    public static final String PREV_PRICE = "first_price";
     private HttpURLConnection conn ;
     OutputStream os ;
     InputStream is;
@@ -115,7 +118,6 @@ public class HttpConnection {
 
     private void updateResponse(Map<String , Coin> coins ,JSONObject response ) throws JSONException {
 
-        JSONObject jObj;
 
 //        jObj = response.getJSONObject("data");
 //        Iterator<String>
@@ -134,11 +136,11 @@ public class HttpConnection {
                     String coinName = coinKeys.next();
                     JSONObject priceInfo = (JSONObject) coinInfo.get(coinName);
                     Log.v("tinyhhj" , ""+priceInfo.toString());
-                    double curPrice = (double) Double.parseDouble((String)priceInfo.get("first_price"));
-                    double avgPrice = (double) Double.parseDouble((String)priceInfo.get("last_price"));
-                    Log.v("tinyhhj" , "" + coinName+exchangeName + " " + curPrice + " " + avgPrice);
+                    double curPrice = (double) Double.parseDouble((String)priceInfo.get(CUR_PRICE));
+                    double prevPrice = (double) Double.parseDouble((String)priceInfo.get(PREV_PRICE));
+                    Log.v("tinyhhj" , "" + coinName+exchangeName + " " + curPrice + " " + prevPrice);
                     Coin c = coins.get(coinName + exchangeName);
-                    c.setPriceInfo(new PriceInfo(curPrice, avgPrice));
+                    c.setPriceInfo(new PriceInfo(curPrice, prevPrice));
                 }
             }
 //        }

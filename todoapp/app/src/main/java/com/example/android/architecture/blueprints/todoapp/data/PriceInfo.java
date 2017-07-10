@@ -6,7 +6,7 @@ package com.example.android.architecture.blueprints.todoapp.data;
 
 public class PriceInfo {
     private double mCurPrice;               // 현재가
-    private double mAvgPrice24h;           // 전일 24시간 평균가격
+    private double mPrevPrice;           // 전일 24시간 평균가격
     private String  mCurrency;              // KRW : 원 , USD : 달러
 
     public PriceInfo()
@@ -21,7 +21,7 @@ public class PriceInfo {
     public PriceInfo(double curPrice , double avgPrice24h , String currency)
     {
         mCurPrice = curPrice;
-        mAvgPrice24h = avgPrice24h;
+        mPrevPrice = avgPrice24h;
         mCurrency = currency;
     }
 
@@ -30,7 +30,7 @@ public class PriceInfo {
     }
 
     public double getAvgPrice24h() {
-        return mAvgPrice24h;
+        return mPrevPrice;
     }
 
     public String getCurrency() {
@@ -41,8 +41,8 @@ public class PriceInfo {
         this.mCurPrice = mCurPrice;
     }
 
-    public void setAvgPrice24h(double mAvgPrice24h) {
-        this.mAvgPrice24h = mAvgPrice24h;
+    public void setAvgPrice24h(double prevPrice) {
+        this.mPrevPrice = prevPrice;
     }
 
     public void setCurrency(String mCurrency) {

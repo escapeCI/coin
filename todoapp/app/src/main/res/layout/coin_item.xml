@@ -1,22 +1,55 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="?android:attr/listPreferredItemHeight"
-    android:background ="@drawable/touch_feedback">
+    android:background ="@drawable/touch_feedback"
+    android:baselineAligned="false"
+    android:orientation="vertical">
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal">
 
         <TextView
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/exchange_name"/>
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="BTC"
+            android:paddingLeft="15dp"
+            android:paddingRight="15dp"
+            android:textSize="@dimen/coin_font_size"
             android:id="@+id/coin_name"/>
+
+        <TextView
+            android:id="@+id/cur_price"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.95"
+            android:text="3,000원"
+            android:gravity="right"
+            android:textAlignment="gravity"
+            android:textSize="@dimen/coin_font_size" />
+
+        <ImageView
+            android:id="@+id/updown_triangle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1.29"
+            android:paddingLeft="15dp"
+            app:srcCompat="@drawable/blue_triangle" />
+
+        <TextView
+            android:id="@+id/diff_price"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="100"
+            android:gravity="right"
+            android:textAlignment="gravity"
+            android:paddingRight="15dp"
+            android:textSize="@dimen/coin_font_size" />
 
     </LinearLayout>
     <LinearLayout
@@ -24,13 +57,22 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal">
         <TextView
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/cur_price"/>
+            android:layout_weight="2.15"
+            android:paddingLeft="15dp"
+            android:paddingRight="15dp"
+            android:text="bithumb"
+            android:id="@+id/exchange_name"/>
         <TextView
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/avg_price"/>
+            android:layout_weight="1"
+            android:text="0.25%"
+            android:gravity="right"
+            android:textAlignment="gravity"
+            android:paddingRight="15dp"
+            android:id="@+id/diff_rate"/>
     </LinearLayout>
 
 

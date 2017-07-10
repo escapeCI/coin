@@ -1,5 +1,6 @@
 package com.example.android.architecture.blueprints.todoapp.currency;
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
@@ -9,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -18,6 +20,7 @@ import com.example.android.architecture.blueprints.todoapp.data.Coin;
 import com.example.android.architecture.blueprints.todoapp.tasks.ScrollChildSwipeRefreshLayout;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -27,9 +30,8 @@ import java.util.List;
 public class CurrencyFragment extends Fragment implements CurrencyContract.View{
     private CurrencyContract.Presenter mPresenter;
     private CoinsAdapter mListAdapter;
-
-
     public CurrencyFragment() {
+
 
     }
 
@@ -174,12 +176,27 @@ public class CurrencyFragment extends Fragment implements CurrencyContract.View{
             TextView coinName = (TextView) rowView.findViewById(R.id.coin_name);
             TextView exchangeName = (TextView) rowView.findViewById(R.id.exchange_name);
             TextView curPrice = (TextView) rowView.findViewById(R.id.cur_price);
-            TextView avgPrice = (TextView) rowView.findViewById(R.id.avg_price);
+//            TextView avgPrice = (TextView) rowView.findViewById(R.id.avg_price);
+            TextView diffPrice = (TextView) rowView.findViewById(R.id.diff_price);
+            TextView diffRate = (TextView) rowView.findViewById(R.id.diff_rate);
+            ImageView updown = (ImageView) rowView.findViewById(R.id.updown_triangle);
 
-            coinName.setText(coin.getName());
+
+            coinName.setText(coin.getName().toUpperCase());
             exchangeName.setText(coin.getExchange().getName());
             curPrice.setText(String.valueOf(coin.getPriceInfo().getCurPrice()));
-            avgPrice.setText(String.valueOf(coin.getPriceInfo().getAvgPrice24h()));
+
+            double diff = coin.getPriceInfo().getCurPrice() - coin.getPriceInfo().getAvgPrice24h();
+            updown.setImageResource( (diff < 0) ? R.drawable.blue_triangle  : R.drawable.red_triangle );
+            curPrice.setTextColor((diff < 0) ? Color.BLUE : Color.RED );
+            diffPrice.setTextColor((diff < 0) ? Color.BLUE : Color.RED );
+            diffRate.setTextColor((diff < 0) ? Color.BLUE : Color.RED );
+
+            double rate = (diff / coin.getPriceInfo().getAvgPrice24h()) * 100;
+            rate = Double.parseDouble(String.format("%.2f", rate));
+
+            diffPrice.setText(String.valueOf(diff));
+            diffRate.setText(String.valueOf(rate) + "%");
 
             //click listener
             return rowView;

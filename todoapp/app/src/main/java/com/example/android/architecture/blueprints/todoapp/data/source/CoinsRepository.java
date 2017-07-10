@@ -59,8 +59,8 @@ public class CoinsRepository implements CoinsDataSource {
                     ////////////////////////////////////////////////////////////////////////////////////////////
                     mCachedCoins.put("ETHbithumb" ,  new Coin("eth" ,new Exchange("bithumb")));
                     mCachedCoins.put("BTCbithumb" ,  new Coin("btc" ,new Exchange("bithumb")));
-                    //mCachedCoins.put("ETHcoinone" ,  new Coin("eth" ,new Exchange("coinone")));
-                    //mCachedCoins.put("BTCcoinone" ,  new Coin("btc" ,new Exchange("coinone")));
+                    mCachedCoins.put("ETHcoinone" ,  new Coin("eth" ,new Exchange("coinone")));
+                    mCachedCoins.put("BTCcoinone" ,  new Coin("btc" ,new Exchange("coinone")));
                     //callback.onDataNotAvailable();
                 }
             });

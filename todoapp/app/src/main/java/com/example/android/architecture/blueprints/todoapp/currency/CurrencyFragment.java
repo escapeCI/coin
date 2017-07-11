@@ -19,6 +19,7 @@ import com.example.android.architecture.blueprints.todoapp.R;
 import com.example.android.architecture.blueprints.todoapp.data.Coin;
 import com.example.android.architecture.blueprints.todoapp.tasks.ScrollChildSwipeRefreshLayout;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -48,6 +49,21 @@ public class CurrencyFragment extends Fragment implements CurrencyContract.View{
         super.onCreate(savedInstanceState);
         mListAdapter = new CoinsAdapter(new ArrayList<Coin>(0) , null);
         Toast.makeText(getActivity() , "CurrencyFragment onCreate()",Toast.LENGTH_SHORT).show();
+
+        /* 5초마다 현재가 갱신 쓰레드 */
+        refreshThread = new Thread(new Runnable(){
+            @Override
+            public void run(){
+                while(!refreshThread.isInterrupted()){
+                    mPresenter.start();
+                    try {
+                        Thread.sleep(refresh_period);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        });
     }
 
     @Override
@@ -56,6 +72,7 @@ public class CurrencyFragment extends Fragment implements CurrencyContract.View{
         Log.v("tinyhhj","### CurrencyFragment onResume() triggered! ###");
         mPresenter.start();
 
+//       2017-07-12 : 현재가 스레드 임시 주석처리
 //        /* 5초마다 현재가 갱신 */
 //        refreshThread = new Thread(new Runnable(){
 //           @Override
@@ -78,13 +95,33 @@ public class CurrencyFragment extends Fragment implements CurrencyContract.View{
     }
 
     @Override
+    public void onPause() {
+        super.onPause();
+    }
+
+    @Override
     public void onStop() {
+
         super.onStop();
         Log.v("tinyhhj","### CurrencyFragment onStop() triggered! ###");
         Toast.makeText(getActivity() , "CurrencyFragment onStop()",Toast.LENGTH_SHORT).show();
         /* 화면 stop상태에서 현재가 갱신 쓰레드 인터럽트 */
 //        refreshThread.interrupt();
 
+//       2017-07-12 : 현재가 스레드 임시 주석처리
+//        Log.i("seongenie", "Thread Stop");
+//        /* 화면 stop상태에서 현재가 갱신 쓰레드 인터럽트 */
+//        if(!refreshThread.isInterrupted())refreshThread.interrupt();
+//        Log.i("seongenie", "Thread State : "  + refreshThread.isInterrupted());
+
+        super.onStop();
+    }
+
+    @Override
+    public void onDestroy() {
+        //       2017-07-12 : 현재가 스레드 임시 주석처리
+        //if(!refreshThread.isInterrupted())refreshThread.interrupt();
+        super.onDestroy();
     }
 
     @Override
@@ -217,18 +254,25 @@ public class CurrencyFragment extends Fragment implements CurrencyContract.View{
 
             coinName.setText(coin.getName().toUpperCase());
             exchangeName.setText(coin.getExchange().getName());
-            curPrice.setText(String.valueOf((int)coin.getPriceInfo().getCurPrice()));
+
+            /* 숫자 1,000 형태의 String으로 변환 */
+            DecimalFormat decimalFormat = new DecimalFormat("#,###");
+            String numberAsString = decimalFormat.format((int)coin.getPriceInfo().getCurPrice());
+            curPrice.setText(numberAsString);
 
             double diff = coin.getPriceInfo().getCurPrice() - coin.getPriceInfo().getPrevPrice();
-            updown.setImageResource( (diff < 0) ? R.drawable.blue_triangle  : R.drawable.red_triangle );
-            curPrice.setTextColor((diff < 0) ? Color.BLUE : Color.RED );
-            diffPrice.setTextColor((diff < 0) ? Color.BLUE : Color.RED );
-            diffRate.setTextColor((diff < 0) ? Color.BLUE : Color.RED );
+            numberAsString = decimalFormat.format((int)diff);
+            diffPrice.setText(numberAsString);
+
+            if(diff != 0){
+                updown.setImageResource( (diff < 0) ? R.drawable.blue_triangle  : R.drawable.red_triangle );
+                curPrice.setTextColor( (diff < 0) ? Color.BLUE : Color.RED );
+                diffRate.setTextColor( (diff < 0) ? Color.BLUE : Color.RED );
+                diffPrice.setTextColor((diff < 0) ? Color.BLUE : Color.RED );
+            }
 
             double rate = (diff / coin.getPriceInfo().getPrevPrice()) * 100;
             rate = Double.parseDouble(String.format("%.2f", rate));
-
-            diffPrice.setText(String.valueOf((int)diff));
             diffRate.setText(String.valueOf(rate) + "%");
 
             //click listener

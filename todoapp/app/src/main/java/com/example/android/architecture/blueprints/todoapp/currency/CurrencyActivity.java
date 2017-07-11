@@ -1,5 +1,6 @@
 package com.example.android.architecture.blueprints.todoapp.currency;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
@@ -21,7 +22,6 @@ import com.example.android.architecture.blueprints.todoapp.data.source.CoinsData
 import com.example.android.architecture.blueprints.todoapp.data.source.CoinsRepository;
 import com.example.android.architecture.blueprints.todoapp.data.source.local.CoinsLocalDataSource;
 import com.example.android.architecture.blueprints.todoapp.util.ActivityUtils;
-
 import javax.sql.DataSource;
 
 
@@ -36,26 +36,32 @@ public class CurrencyActivity extends AppCompatActivity  implements CurrencyCont
     private CurrencyContract.View[] mFragmentArr = new CurrencyContract.View[MAX_NUM_FRAGMENTS];
     private int currentFragmentId  = MY_FAVOR_COIN_FRAGMENT ;
 
-
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar.setTitleTextColor(0xFFFFFFFF);
         setSupportActionBar(toolbar);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                Intent favorAddActivity = new Intent(CurrencyActivity.this, FavorAddActivity.class);
+                startActivity(favorAddActivity);
+                overridePendingTransition(R.anim.sliding_on, R.anim.no_change);
+
+                /* 새 관심코인 추가 (임시 블럭처리)
                 if( currentFragmentId == CurrencyActivity.MY_FAVOR_COIN_FRAGMENT ) {
                     mPresenterArr[currentFragmentId].changeFragment(MY_FAVOR_COIN_FRAGMENT  , ALL_FAVOR_COIN_FRAGMENT);
                 }
                 else {
 
                 }
+                */
+
+
             }
         });
 

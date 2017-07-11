@@ -159,6 +159,8 @@ public class HttpConnection {
                 @Override
                 protected Void doInBackground(Void... params) {
                     try {
+                        if( isCancelled())
+                            return null;
                         obj = changeListIntoJson(coins);
                         //서버에 요청
                         JSONObject responseObj = sendJsonRequest(obj);
@@ -209,6 +211,10 @@ public class HttpConnection {
                 @Override
                 protected Void doInBackground(Void... params) {
                     try {
+                        if( isCancelled()) {
+                            Log.v("tinyhhj","isCancelled triggered");
+                            return null;
+                        }
                         //os = conn.getOutputStream();
                         is = conn.getInputStream();
                         Log.v("tinyhhj" ,"http result : " + conn.getResponseCode());

@@ -1,5 +1,6 @@
 package com.example.android.architecture.blueprints.todoapp.data.source.local;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -122,6 +123,21 @@ public class CoinsLocalDataSource implements CoinsDataSource {
 
     @Override
     public void refreshAllFavorCoins() {
+
+    }
+
+    @Override
+    public void addNewFavorCoin(String coinName, String exName) {
+        SQLiteDatabase db = mDbHelper.getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+
+        contentValues.put(CoinsPersistenceContract.CoinEntry.COIN_NAME , coinName);
+        contentValues.put(CoinsPersistenceContract.CoinEntry.COIN_EXCHANGE_NAME , exName);
+        contentValues.put(CoinsPersistenceContract.CoinEntry.COIN_FAVORED , String.valueOf(CoinsPersistenceContract.Favor.FAVOR));
+
+        db.insert(CoinsPersistenceContract.CoinEntry.TABLE_NAME , null, contentValues);
+
+        db.close();
 
     }
 }

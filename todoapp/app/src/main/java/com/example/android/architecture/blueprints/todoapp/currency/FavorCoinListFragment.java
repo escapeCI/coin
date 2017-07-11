@@ -1,5 +1,6 @@
 package com.example.android.architecture.blueprints.todoapp.currency;
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -12,6 +13,8 @@ import android.widget.TextView;
 
 import com.example.android.architecture.blueprints.todoapp.R;
 import com.example.android.architecture.blueprints.todoapp.data.Coin;
+import com.example.android.architecture.blueprints.todoapp.data.source.local.CoinsPersistenceContract;
+import com.example.android.architecture.blueprints.todoapp.tasks.ScrollChildSwipeRefreshLayout;
 
 import java.util.ArrayList;
 import java.util.Currency;
@@ -31,7 +34,7 @@ public class FavorCoinListFragment extends Fragment
     public FavorCoinListFragment() {}
     public void onCreate(Bundle bundle) {
         super.onCreate(bundle);
-        mListAdapter = new CoinsAdapter(new ArrayList<Coin>(0) , null);
+        mListAdapter = new CoinsAdapter(new ArrayList<Coin>(0) , (CurrencyContract.CoinItemListener) getActivity());
     }
     public void onResume() {
         super.onResume();
@@ -89,14 +92,24 @@ public class FavorCoinListFragment extends Fragment
         //set up favorcoinview
         ListView listView = (ListView) root.findViewById(R.id.coin_list);
         listView.setAdapter(mListAdapter);
+
+        ScrollChildSwipeRefreshLayout srl = (ScrollChildSwipeRefreshLayout) root.findViewById(R.id.refresh_layout);
+        srl.setScrollUpChild(listView);
+        srl.setOnRefreshListener( new SwipeRefreshLayout.OnRefreshListener() {
+
+            @Override
+            public void onRefresh() {
+                mPresenter.start();
+            }
+        });
         return root;
     }
 
     private static class CoinsAdapter extends BaseAdapter {
         private List<Coin> mCoins;
-        private CurrencyFragment.CoinItemListener mItemListener;
+        private CurrencyContract.CoinItemListener mItemListener;
 
-        public CoinsAdapter(List<Coin> coins , CurrencyFragment.CoinItemListener listener )
+        public CoinsAdapter(List<Coin> coins , CurrencyContract.CoinItemListener listener )
         {
             mCoins = coins;
             mItemListener = listener;
@@ -138,7 +151,17 @@ public class FavorCoinListFragment extends Fragment
 //            TextView avgPrice = (TextView) rowView.findViewById(R.id.avg_price);
 
             coinName.setText(coin.getName());
+            coinName.setTextColor(coin.getFavor() == CoinsPersistenceContract.Favor.FAVOR ? Color.RED : Color.BLACK);
             exchangeName.setText(coin.getExchange().getName());
+
+            rowView.setOnClickListener(new View.OnClickListener() {
+
+                @Override
+                public void onClick(View v) {
+                    mItemListener.onCoinClick(coin);
+                }
+            });
+
 //            curPrice.setText(String.valueOf(coin.getPriceInfo().getCurPrice()));
 //            avgPrice.setText(String.valueOf(coin.getPriceInfo().getAvgPrice24h()));
 
@@ -146,4 +169,6 @@ public class FavorCoinListFragment extends Fragment
             return rowView;
         }
     }
+
+
 }

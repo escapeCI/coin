@@ -53,32 +53,38 @@ public class CurrencyFragment extends Fragment implements CurrencyContract.View{
     @Override
     public void onResume() {
         super.onResume();
+        Log.v("tinyhhj","### CurrencyFragment onResume() triggered! ###");
         mPresenter.start();
 
-        /* 5초마다 현재가 갱신 */
-        refreshThread = new Thread(new Runnable(){
-           @Override
-            public void run(){
-               while(true){
-                   mPresenter.start();
-                   try {
-                       Thread.sleep(refresh_period);
-                   } catch (InterruptedException e) {
-                       e.printStackTrace();
-                   }
-               }
-
-           }
-        });
-        refreshThread.start();
+//        /* 5초마다 현재가 갱신 */
+//        refreshThread = new Thread(new Runnable(){
+//           @Override
+//            public void run(){
+//               while(true){
+//                   mPresenter.start();
+//                   try {
+//                       Thread.sleep(refresh_period);
+//                   } catch (InterruptedException e) {
+//                       e.printStackTrace();
+//                       break;
+//                   }
+//
+//               }
+//
+//           }
+//        });
+//        refreshThread.start();
         Toast.makeText(getActivity() , "CurrencyFragment onResume()",Toast.LENGTH_SHORT).show();
     }
 
     @Override
     public void onStop() {
         super.onStop();
+        Log.v("tinyhhj","### CurrencyFragment onStop() triggered! ###");
+        Toast.makeText(getActivity() , "CurrencyFragment onStop()",Toast.LENGTH_SHORT).show();
         /* 화면 stop상태에서 현재가 갱신 쓰레드 인터럽트 */
-        refreshThread.interrupt();
+//        refreshThread.interrupt();
+
     }
 
     @Override
@@ -162,9 +168,9 @@ public class CurrencyFragment extends Fragment implements CurrencyContract.View{
 
     private static class CoinsAdapter extends BaseAdapter{
         private List<Coin> mCoins;
-        private CoinItemListener mItemListener;
+        private CurrencyContract.CoinItemListener mItemListener;
 
-        public CoinsAdapter(List<Coin> coins , CoinItemListener listener )
+        public CoinsAdapter(List<Coin> coins , CurrencyContract.CoinItemListener listener )
         {
             mCoins = coins;
             mItemListener = listener;
@@ -213,13 +219,13 @@ public class CurrencyFragment extends Fragment implements CurrencyContract.View{
             exchangeName.setText(coin.getExchange().getName());
             curPrice.setText(String.valueOf((int)coin.getPriceInfo().getCurPrice()));
 
-            double diff = coin.getPriceInfo().getCurPrice() - coin.getPriceInfo().getAvgPrice24h();
+            double diff = coin.getPriceInfo().getCurPrice() - coin.getPriceInfo().getPrevPrice();
             updown.setImageResource( (diff < 0) ? R.drawable.blue_triangle  : R.drawable.red_triangle );
             curPrice.setTextColor((diff < 0) ? Color.BLUE : Color.RED );
             diffPrice.setTextColor((diff < 0) ? Color.BLUE : Color.RED );
             diffRate.setTextColor((diff < 0) ? Color.BLUE : Color.RED );
 
-            double rate = (diff / coin.getPriceInfo().getAvgPrice24h()) * 100;
+            double rate = (diff / coin.getPriceInfo().getPrevPrice()) * 100;
             rate = Double.parseDouble(String.format("%.2f", rate));
 
             diffPrice.setText(String.valueOf((int)diff));
@@ -230,7 +236,5 @@ public class CurrencyFragment extends Fragment implements CurrencyContract.View{
         }
     }
 
-    public interface CoinItemListener {
-        void onCoinClick(Coin c);
-    }
+
 }

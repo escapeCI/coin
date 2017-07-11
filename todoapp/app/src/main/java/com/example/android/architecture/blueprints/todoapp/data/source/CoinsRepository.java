@@ -1,7 +1,10 @@
 package com.example.android.architecture.blueprints.todoapp.data.source;
 
+import android.util.Log;
+
 import com.example.android.architecture.blueprints.todoapp.data.Coin;
 import com.example.android.architecture.blueprints.todoapp.data.Exchange;
+import com.example.android.architecture.blueprints.todoapp.data.source.local.CoinsPersistenceContract;
 
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -110,6 +113,13 @@ public class CoinsRepository implements CoinsDataSource {
     }
 
     @Override
+    public void addNewFavorCoin(String coinName, String exName) {
+        mCoinsLocalDataSource.addNewFavorCoin(coinName, exName);
+        // 관심코인 추가한뒤에 리프레시
+        refreshCoins();
+    }
+
+    @Override
     public void deleteAllCoins() {
 
     }
@@ -125,18 +135,54 @@ public class CoinsRepository implements CoinsDataSource {
     }
 
     @Override
-    public void getAllFavorCoins(LoadCoinsCallback callback) {
+    public void getAllFavorCoins(final LoadCoinsCallback callback) {
         if( mAllFavorCacheIsDirty || mCachedAllFavorCoins == null)
         {
+            Log.v("tinyhhj" , "http get method from server");
             HttpConnection httpConnection = new HttpConnection(HttpConnection.url + "possCoin.php","GET");
-            List<Coin> temp = new ArrayList<Coin>(0);
-            httpConnection.requestAllFavorCoinList(temp , callback);
-            refreshAllFavorCache(temp);
+            final List<Coin> temp = new ArrayList<Coin>(0);
+            httpConnection.requestAllFavorCoinList(temp, new LoadCoinsCallback() {
+                @Override
+                public void onCoinsLoaded(List<Coin> Coins) {
+                    for(Coin c : Coins)
+                        Log.v("tinyhhj", "keys " + c.getName()+c.getExchange().getName());
+                    refreshAllFavorCache(Coins);
+                    if (mCachedCoins == null || mCacheIsDirty == true )
+                    {
+                        mCoinsLocalDataSource.getFavorCoins(new LoadCoinsCallback() {
+                            @Override
+                            public void onCoinsLoaded(List<Coin> coins) {
+                                for(Coin c : coins) {
+                                    Coin favorCoin = mCachedAllFavorCoins.get(c.getName() + c.getExchange().getName());
+                                    if(favorCoin != null)
+                                        favorCoin.setFavor(CoinsPersistenceContract.Favor.FAVOR);
+                                }
+                            }
+
+                            @Override
+                            public void onDataNotAvailable()
+                            {
+
+                            }
+                        });
+                    }
+                    //for test
+
+                    //mCachedAllFavorCoins.get("BTCokCoin").setFavor(CoinsPersistenceContract.Favor.FAVOR);
+                    //for test
+                    Log.v("tinyhhj" , "callback triggered");
+                    callback.onCoinsLoaded(new ArrayList<Coin>(mCachedAllFavorCoins.values()));
+                }
+
+                @Override
+                public void onDataNotAvailable() {
+                    //목록조회 불가능할때 정의
+                }
+            });
+
         }
-        else
-        {
-            callback.onCoinsLoaded(new ArrayList<Coin>(mCachedAllFavorCoins.values()));
-        }
+
+
     }
     private void refreshAllFavorCache(List<Coin> coins)
     {

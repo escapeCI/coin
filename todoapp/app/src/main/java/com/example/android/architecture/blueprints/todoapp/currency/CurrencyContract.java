@@ -27,9 +27,15 @@ public interface CurrencyContract {
     interface Presenter extends BasePresenter
     {
         //For CurrencyPresenter
-        void addNewFavorCoin(int from , int to);
+        void changeFragment(int from , int to);
+        void addNewFavorCoin(Coin c);
+        void addNewFavorCoin(String coinName, String exName );
         //For FavorCoinsListPresenter
 
+    }
+
+    interface CoinItemListener {
+        void onCoinClick(Coin c) ;
     }
 
 }

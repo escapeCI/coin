@@ -56,7 +56,7 @@ public class CurrencyPresenter implements CurrencyContract.Presenter {
                 {
                     //show list
                     for (Coin c : Coins)
-                        Log.v("tinyhhj" , "priceinfo : " +c.getPriceInfo().getCurPrice() + " " + c.getPriceInfo().getAvgPrice24h());
+                        Log.v("tinyhhj" , "priceinfo : " +c.getPriceInfo().getCurPrice() + " " + c.getPriceInfo().getPrevPrice());
                     mFragment.showFavorCoins(Coins);
                 }
 
@@ -70,9 +70,19 @@ public class CurrencyPresenter implements CurrencyContract.Presenter {
 
     }
 
-    public void addNewFavorCoin(int from , int to) {
+    public void changeFragment(int from , int to) {
         //create new fragment for all favorcoin list
         mFragment.showAllFavorFragment(from , to);
+    }
+
+    @Override
+    public void addNewFavorCoin(Coin c) {
+
+    }
+
+    @Override
+    public void addNewFavorCoin(String coinName, String exName) {
+
     }
 
 }

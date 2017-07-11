@@ -16,6 +16,7 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.example.android.architecture.blueprints.todoapp.R;
+import com.example.android.architecture.blueprints.todoapp.data.Coin;
 import com.example.android.architecture.blueprints.todoapp.data.source.CoinsDataSource;
 import com.example.android.architecture.blueprints.todoapp.data.source.CoinsRepository;
 import com.example.android.architecture.blueprints.todoapp.data.source.local.CoinsLocalDataSource;
@@ -24,7 +25,7 @@ import com.example.android.architecture.blueprints.todoapp.util.ActivityUtils;
 import javax.sql.DataSource;
 
 
-public class CurrencyActivity extends AppCompatActivity {
+public class CurrencyActivity extends AppCompatActivity  implements CurrencyContract.CoinItemListener{
     //Fragment id
     public static final int MY_FAVOR_COIN_FRAGMENT =  0;
     public static final int ALL_FAVOR_COIN_FRAGMENT = 1;
@@ -50,7 +51,7 @@ public class CurrencyActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 if( currentFragmentId == CurrencyActivity.MY_FAVOR_COIN_FRAGMENT ) {
-                    mPresenterArr[currentFragmentId].addNewFavorCoin(MY_FAVOR_COIN_FRAGMENT  , ALL_FAVOR_COIN_FRAGMENT);
+                    mPresenterArr[currentFragmentId].changeFragment(MY_FAVOR_COIN_FRAGMENT  , ALL_FAVOR_COIN_FRAGMENT);
                 }
                 else {
 
@@ -86,7 +87,11 @@ public class CurrencyActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        if (drawer.isDrawerOpen(GravityCompat.START)) {
+        //뒤로가기버튼눌렀을 때, 전체조회화면이면 메인화면으로 복귀한다.
+        if (currentFragmentId == ALL_FAVOR_COIN_FRAGMENT) {
+            changeFragment(ALL_FAVOR_COIN_FRAGMENT , MY_FAVOR_COIN_FRAGMENT);
+        }
+        else if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
             super.onBackPressed();
@@ -151,5 +156,13 @@ public class CurrencyActivity extends AppCompatActivity {
     }
     public int getCurrentFragmentId() {
         return currentFragmentId;
+    }
+
+    @Override
+    public void onCoinClick(Coin c) {
+        if(getCurrentFragmentId() == ALL_FAVOR_COIN_FRAGMENT)
+        {
+            mPresenterArr[ALL_FAVOR_COIN_FRAGMENT].addNewFavorCoin(c.getName() , c.getExchange().getName());
+        }
     }
 }

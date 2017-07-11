@@ -33,6 +33,7 @@ public interface CoinsDataSource {
 
     void deleteAllCoins();
     void deleteCoin(String name , String exName);
+
     //For CurrencyPresenter
     void refreshCoins();
     void getFavorCoins(LoadCoinsCallback callback);
@@ -40,5 +41,6 @@ public interface CoinsDataSource {
     //For FavorCoinListPresenter
     void getAllFavorCoins(LoadCoinsCallback callback);
     void refreshAllFavorCoins();
+    void addNewFavorCoin(String coinName , String exName);
 
 }

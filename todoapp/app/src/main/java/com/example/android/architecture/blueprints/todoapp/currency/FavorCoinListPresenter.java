@@ -56,7 +56,17 @@ public class FavorCoinListPresenter implements CurrencyContract.Presenter{
     }
 
     @Override
-    public void addNewFavorCoin(int from, int to) {
+    public void changeFragment(int from, int to) {
 
+    }
+
+    @Override
+    public void addNewFavorCoin(Coin c) {
+        addNewFavorCoin(c.getName() , c.getExchange().getName());
+    }
+
+    @Override
+    public void addNewFavorCoin(String coinName, String exName) {
+        mSource.addNewFavorCoin(coinName, exName);
     }
 }

@@ -29,7 +29,7 @@ public class PriceInfo {
         return mCurPrice;
     }
 
-    public double getAvgPrice24h() {
+    public double getPrevPrice() {
         return mPrevPrice;
     }
 
@@ -41,7 +41,7 @@ public class PriceInfo {
         this.mCurPrice = mCurPrice;
     }
 
-    public void setAvgPrice24h(double prevPrice) {
+    public void setPrevPrice(double prevPrice) {
         this.mPrevPrice = prevPrice;
     }
 

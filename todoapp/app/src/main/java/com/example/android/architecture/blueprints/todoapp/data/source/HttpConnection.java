@@ -134,8 +134,8 @@ public class HttpConnection {
                     String coinName = coinKeys.next();
                     JSONObject priceInfo = (JSONObject) coinInfo.get(coinName);
                     Log.v("tinyhhj" , ""+priceInfo.toString());
-                    double curPrice = (double) Double.parseDouble((String)priceInfo.get("first_price"));
-                    double avgPrice = (double) Double.parseDouble((String)priceInfo.get("last_price"));
+                    double curPrice = (double) Double.parseDouble((String)priceInfo.get("last_price"));
+                    double avgPrice = (double) Double.parseDouble((String)priceInfo.get("first_price"));
                     Log.v("tinyhhj" , "" + coinName+exchangeName + " " + curPrice + " " + avgPrice);
                     Coin c = coins.get(coinName + exchangeName);
                     c.setPriceInfo(new PriceInfo(curPrice, avgPrice));

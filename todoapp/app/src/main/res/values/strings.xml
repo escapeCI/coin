@@ -38,6 +38,8 @@
     <string name="statistics_error">Error loading statistics.</string>
     <string name="no_data">No data</string>
     <string name="loading">LOADING</string>
+    <string name="favor_add">추가</string>
+    <string name="favor_cancel">취소</string>
 
     <string-array name="list_tasks_array">
         <item>@string/nav_all</item>

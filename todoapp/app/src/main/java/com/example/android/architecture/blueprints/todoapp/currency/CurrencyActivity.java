@@ -21,6 +21,7 @@ import com.example.android.architecture.blueprints.todoapp.data.Coin;
 import com.example.android.architecture.blueprints.todoapp.data.source.CoinsDataSource;
 import com.example.android.architecture.blueprints.todoapp.data.source.CoinsRepository;
 import com.example.android.architecture.blueprints.todoapp.data.source.local.CoinsLocalDataSource;
+import com.example.android.architecture.blueprints.todoapp.data.source.local.CoinsPersistenceContract;
 import com.example.android.architecture.blueprints.todoapp.util.ActivityUtils;
 import javax.sql.DataSource;
 
@@ -52,14 +53,14 @@ public class CurrencyActivity extends AppCompatActivity  implements CurrencyCont
                 startActivity(favorAddActivity);
                 overridePendingTransition(R.anim.sliding_on, R.anim.no_change);
 
-                /* 새 관심코인 추가 (임시 블럭처리)
-                if( currentFragmentId == CurrencyActivity.MY_FAVOR_COIN_FRAGMENT ) {
-                    mPresenterArr[currentFragmentId].changeFragment(MY_FAVOR_COIN_FRAGMENT  , ALL_FAVOR_COIN_FRAGMENT);
-                }
-                else {
+                // 새 관심코인 추가 (임시 블럭처리)
+//                if( currentFragmentId == CurrencyActivity.MY_FAVOR_COIN_FRAGMENT ) {
+//                    mPresenterArr[currentFragmentId].changeFragment(MY_FAVOR_COIN_FRAGMENT  , ALL_FAVOR_COIN_FRAGMENT);
+//                }
+//                else {
+//
+//                }
 
-                }
-                */
 
 
             }
@@ -94,10 +95,10 @@ public class CurrencyActivity extends AppCompatActivity  implements CurrencyCont
     public void onBackPressed() {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         //뒤로가기버튼눌렀을 때, 전체조회화면이면 메인화면으로 복귀한다.
-        if (currentFragmentId == ALL_FAVOR_COIN_FRAGMENT) {
-            changeFragment(ALL_FAVOR_COIN_FRAGMENT , MY_FAVOR_COIN_FRAGMENT);
-        }
-        else if (drawer.isDrawerOpen(GravityCompat.START)) {
+//        if (currentFragmentId == ALL_FAVOR_COIN_FRAGMENT) {
+//            changeFragment(ALL_FAVOR_COIN_FRAGMENT , MY_FAVOR_COIN_FRAGMENT);
+//        }
+        if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
             super.onBackPressed();
@@ -168,7 +169,10 @@ public class CurrencyActivity extends AppCompatActivity  implements CurrencyCont
     public void onCoinClick(Coin c) {
         if(getCurrentFragmentId() == ALL_FAVOR_COIN_FRAGMENT)
         {
-            mPresenterArr[ALL_FAVOR_COIN_FRAGMENT].addNewFavorCoin(c.getName() , c.getExchange().getName());
+            if (c.getFavor()  == CoinsPersistenceContract.Favor.FAVOR)
+                mPresenterArr[ALL_FAVOR_COIN_FRAGMENT].removeFavorCoin(c);
+            else
+                mPresenterArr[ALL_FAVOR_COIN_FRAGMENT].addNewFavorCoin(c.getName() , c.getExchange().getName());
         }
     }
 }

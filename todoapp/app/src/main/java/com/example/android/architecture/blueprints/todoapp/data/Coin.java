@@ -1,12 +1,14 @@
 package com.example.android.architecture.blueprints.todoapp.data;
 
+import android.support.annotation.NonNull;
+
 import com.example.android.architecture.blueprints.todoapp.data.source.local.CoinsPersistenceContract;
 
 /**
  * Created by tinyhhj on 2017-06-25.
  */
 
-public class Coin {
+public class Coin implements Comparable<Coin>{
     private String mName;
     private Exchange mExchange;
     private PriceInfo mPriceInfo;
@@ -34,4 +36,8 @@ public class Coin {
     public CoinsPersistenceContract.Favor getFavor() {return mFavor;}
 
 
+    @Override
+    public int compareTo(@NonNull Coin o) {
+        return this.getExchange().getName().compareTo(o.getExchange().getName());
+    }
 }

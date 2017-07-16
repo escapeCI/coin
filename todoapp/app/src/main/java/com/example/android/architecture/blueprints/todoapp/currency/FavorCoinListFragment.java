@@ -71,7 +71,7 @@ public class FavorCoinListFragment extends Fragment
     }
 
     @Override
-    public void showAllFavorCoins(List<Coin> coins) {
+    public void showAllFavorExchanges(List<Coin> coins) {
         mListAdapter.replaceData(coins);
     }
 
@@ -158,7 +158,7 @@ public class FavorCoinListFragment extends Fragment
 
                 @Override
                 public void onClick(View v) {
-                    mItemListener.onCoinClick(coin);
+                        mItemListener.onCoinClick(coin);
                 }
             });
 

@@ -25,6 +25,7 @@ public class CurrencyPresenter implements CurrencyContract.Presenter {
     }
     @Override
     public void start() {
+
         loadFavorCoins(false || mFirstLoad , true);
         mFirstLoad = false;
     }
@@ -73,6 +74,16 @@ public class CurrencyPresenter implements CurrencyContract.Presenter {
     public void changeFragment(int from , int to) {
         //create new fragment for all favorcoin list
         mFragment.showAllFavorFragment(from , to);
+    }
+
+    @Override
+    public void removeFavorCoin(Coin c) {
+
+    }
+
+    @Override
+    public void removeFavorCoin(String coinName, String exName) {
+
     }
 
     @Override

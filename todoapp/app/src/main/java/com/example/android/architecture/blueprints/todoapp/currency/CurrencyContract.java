@@ -20,7 +20,7 @@ public interface CurrencyContract {
         void showFavorCoins(List<Coin> coins);
         void showAllFavorFragment(int from , int to) ;
         //For FavorCoinListFragment
-        void showAllFavorCoins(List<Coin> coins);
+        void showAllFavorExchanges(List<Coin> coins);
 
     }
 
@@ -28,10 +28,13 @@ public interface CurrencyContract {
     {
         //For CurrencyPresenter
         void changeFragment(int from , int to);
-        void addNewFavorCoin(Coin c);
-        void addNewFavorCoin(String coinName, String exName );
-        //For FavorCoinsListPresenter
 
+
+        //For FavorCoinsListPresenter
+        void removeFavorCoin(Coin c);
+        void removeFavorCoin(String coinName, String exName );
+        void addNewFavorCoin(String coinName, String exName );
+        void addNewFavorCoin(Coin c);
     }
 
     interface CoinItemListener {

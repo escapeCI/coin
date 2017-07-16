@@ -4,6 +4,7 @@ import android.util.Log;
 
 import com.example.android.architecture.blueprints.todoapp.data.Coin;
 import com.example.android.architecture.blueprints.todoapp.data.source.CoinsDataSource;
+import com.example.android.architecture.blueprints.todoapp.data.source.local.CoinsPersistenceContract;
 
 import java.util.List;
 
@@ -20,6 +21,8 @@ public class FavorCoinListPresenter implements CurrencyContract.Presenter{
         mFragment = fragment;
         mFragment.setPresenter(this);
         mSource = repo;
+        mSource.removeFavorCoin("BTC","okCoin" );
+        mSource.removeFavorCoin("LTC","okCoin" );
     }
     @Override
     public void start() {
@@ -35,15 +38,15 @@ public class FavorCoinListPresenter implements CurrencyContract.Presenter{
         mSource.getAllFavorCoins(new CoinsDataSource.LoadCoinsCallback() {
             @Override
             public void onCoinsLoaded(List<Coin> Coins) {
-                if(!mFragment.isActive())
-                    return;
+//                if(!mFragment.isActive())
+//                    return;
                 if(showLoadingUI)
                     mFragment.setLoadingIndicator(false);
                 if( Coins.isEmpty()) {
                     onDataNotAvailable();
                 }
                 else {
-                    mFragment.showAllFavorCoins(Coins);
+                    mFragment.showAllFavorExchanges(Coins);
                 }
 
             }
@@ -61,12 +64,23 @@ public class FavorCoinListPresenter implements CurrencyContract.Presenter{
     }
 
     @Override
+    public void removeFavorCoin(Coin c) {
+        removeFavorCoin(c.getName() , c.getExchange().getName());
+    }
+
+    @Override
+    public void removeFavorCoin(String coinName, String exName) {
+        mSource.removeFavorCoin(coinName, exName);
+    }
+
+    @Override
     public void addNewFavorCoin(Coin c) {
         addNewFavorCoin(c.getName() , c.getExchange().getName());
     }
 
     @Override
     public void addNewFavorCoin(String coinName, String exName) {
-        mSource.addNewFavorCoin(coinName, exName);
+        mSource.saveNewFavorCoin(coinName, exName );
+
     }
 }

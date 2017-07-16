@@ -113,9 +113,42 @@ public class CoinsRepository implements CoinsDataSource {
     }
 
     @Override
-    public void addNewFavorCoin(String coinName, String exName) {
-        mCoinsLocalDataSource.addNewFavorCoin(coinName, exName);
-        // 관심코인 추가한뒤에 리프레시
+    public void setCoinStatus(String coinName, String exName , CoinsPersistenceContract.Favor favor) {
+
+    }
+
+    @Override
+    public void saveNewFavorCoin(final String coinName, final String exName) {
+
+         mCoinsLocalDataSource.getCoin(coinName, exName, new GetCoinCallback() {
+            @Override
+            public void onCoinLoaded(Coin coin) {
+                mCoinsLocalDataSource.setCoinStatus(coinName , exName , CoinsPersistenceContract.Favor.FAVOR);
+            }
+
+            @Override
+            public void onDataNotAvailable() {
+                mCoinsLocalDataSource.saveNewFavorCoin(coinName, exName);
+
+            }
+        });
+        refreshCoins();
+    }
+
+    @Override
+    public void removeFavorCoin(final String coinName, final String exName) {
+        mCoinsLocalDataSource.getCoin(coinName, exName, new GetCoinCallback() {
+            @Override
+            public void onCoinLoaded(Coin coin) {
+                mCoinsLocalDataSource.setCoinStatus(coinName , exName , CoinsPersistenceContract.Favor.NOT_FAVOR);
+            }
+
+            @Override
+            public void onDataNotAvailable() {
+                mCoinsLocalDataSource.saveNewFavorCoin(coinName, exName);
+
+            }
+        });
         refreshCoins();
     }
 

@@ -2,6 +2,7 @@ package com.example.android.architecture.blueprints.todoapp.data.source;
 
 import com.example.android.architecture.blueprints.todoapp.data.Coin;
 import com.example.android.architecture.blueprints.todoapp.data.Task;
+import com.example.android.architecture.blueprints.todoapp.data.source.local.CoinsPersistenceContract;
 
 import java.util.List;
 
@@ -10,6 +11,8 @@ import java.util.List;
  */
 
 public interface CoinsDataSource {
+
+
     interface LoadCoinsCallback {
 
         void onCoinsLoaded(List<Coin> Coins);
@@ -41,6 +44,8 @@ public interface CoinsDataSource {
     //For FavorCoinListPresenter
     void getAllFavorCoins(LoadCoinsCallback callback);
     void refreshAllFavorCoins();
-    void addNewFavorCoin(String coinName , String exName);
+    void setCoinStatus(String coinName , String exName , CoinsPersistenceContract.Favor favor);
+    void saveNewFavorCoin(String coinName, String exName);
+    void removeFavorCoin(String coinName , String exName);
 
 }

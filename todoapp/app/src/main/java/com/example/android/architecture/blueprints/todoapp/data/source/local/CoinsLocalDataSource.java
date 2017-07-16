@@ -43,6 +43,33 @@ public class CoinsLocalDataSource implements CoinsDataSource {
 
     @Override
     public void getCoin(String name, String exName, GetCoinCallback callback) {
+        SQLiteDatabase db = mDbHelper.getReadableDatabase();
+
+
+        String[] whereArgs = { name , exName};
+        String query = "SELECT " + CoinsPersistenceContract.CoinEntry.COIN_NAME
+                        +" , "    + CoinsPersistenceContract.CoinEntry.COIN_EXCHANGE_NAME
+                        +" , "    + CoinsPersistenceContract.CoinEntry.COIN_FAVORED
+                        +" FROM " + CoinsPersistenceContract.CoinEntry.TABLE_NAME
+                        +" WHERE " + CoinsPersistenceContract.CoinEntry.COIN_NAME + " = ? "
+                        +" AND " +CoinsPersistenceContract.CoinEntry.COIN_EXCHANGE_NAME + " = ? ";
+        Cursor cur = db.rawQuery(query,whereArgs);
+
+        Coin c = null;
+        if( cur.getCount() > 0 && cur != null )
+        {
+            cur.moveToNext();
+            String coinName = cur.getString(cur.getColumnIndex(CoinsPersistenceContract.CoinEntry.COIN_NAME));
+            String exchangeName = cur.getString(cur.getColumnIndex(CoinsPersistenceContract.CoinEntry.COIN_EXCHANGE_NAME));
+            String favored = cur.getString(cur.getColumnIndex(CoinsPersistenceContract.CoinEntry.COIN_FAVORED));
+            c = new Coin(coinName, new Exchange(exchangeName));
+            c.setFavor(String.valueOf(CoinsPersistenceContract.Favor.FAVOR).compareTo(favored) == 0 ? CoinsPersistenceContract.Favor.FAVOR : CoinsPersistenceContract.Favor.NOT_FAVOR);
+            callback.onCoinLoaded(c);
+        }
+        else
+        {
+            callback.onDataNotAvailable();
+        }
 
     }
 
@@ -126,8 +153,11 @@ public class CoinsLocalDataSource implements CoinsDataSource {
 
     }
 
+
+
+
     @Override
-    public void addNewFavorCoin(String coinName, String exName) {
+    public void saveNewFavorCoin(String coinName, String exName) {
         SQLiteDatabase db = mDbHelper.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
 
@@ -139,5 +169,32 @@ public class CoinsLocalDataSource implements CoinsDataSource {
 
         db.close();
 
+    }
+
+    @Override
+    public void removeFavorCoin(String coinName, String exName) {
+        SQLiteDatabase db = mDbHelper.getWritableDatabase();
+        String[] whereArgs = { coinName, exName};
+        String sql = "DELETE FROM "+ CoinsPersistenceContract.CoinEntry.TABLE_NAME + " WHERE "
+                        + CoinsPersistenceContract.CoinEntry.COIN_NAME + " = ? AND "
+                        + CoinsPersistenceContract.CoinEntry.COIN_EXCHANGE_NAME + " = ? ";
+        db.rawQuery(sql,whereArgs);
+
+    }
+
+    @Override
+    public void setCoinStatus(String coinName, String exName , CoinsPersistenceContract.Favor favor) {
+        SQLiteDatabase db = mDbHelper.getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+
+        contentValues.put(CoinsPersistenceContract.CoinEntry.COIN_FAVORED  , String.valueOf(favor));
+
+
+        String whereClauses = CoinsPersistenceContract.CoinEntry.COIN_NAME + " = '"+coinName+"' AND "+CoinsPersistenceContract.CoinEntry.COIN_EXCHANGE_NAME + " = '"
+                                +exName +"'";
+
+
+        db.update(CoinsPersistenceContract.CoinEntry.TABLE_NAME , contentValues , whereClauses , null );
+        db.close();
     }
 }

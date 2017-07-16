@@ -193,7 +193,7 @@ public class CurrencyFragment extends Fragment implements CurrencyContract.View{
     }
 
     @Override
-    public void showAllFavorCoins(List<Coin> coins) {
+    public void showAllFavorExchanges(List<Coin> coins) {
 
     }
 

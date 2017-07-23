@@ -109,6 +109,7 @@ public class CoinsRepository implements CoinsDataSource {
 
     @Override
     public void refreshAllFavorCoins() {
+        Log.v("tinyhhj" , "refreshAllfavorCoins() start");
         mAllFavorCacheIsDirty = true;
     }
 
@@ -123,7 +124,9 @@ public class CoinsRepository implements CoinsDataSource {
          mCoinsLocalDataSource.getCoin(coinName, exName, new GetCoinCallback() {
             @Override
             public void onCoinLoaded(Coin coin) {
-                mCoinsLocalDataSource.setCoinStatus(coinName , exName , CoinsPersistenceContract.Favor.FAVOR);
+                if(coin.getFavor() == CoinsPersistenceContract.Favor.NOT_FAVOR) {
+                    mCoinsLocalDataSource.setCoinStatus(coinName, exName, CoinsPersistenceContract.Favor.FAVOR);
+                }
             }
 
             @Override
@@ -145,7 +148,6 @@ public class CoinsRepository implements CoinsDataSource {
 
             @Override
             public void onDataNotAvailable() {
-                mCoinsLocalDataSource.saveNewFavorCoin(coinName, exName);
 
             }
         });
@@ -180,16 +182,13 @@ public class CoinsRepository implements CoinsDataSource {
                     for(Coin c : Coins)
                         Log.v("tinyhhj", "keys " + c.getName()+c.getExchange().getName());
                     refreshAllFavorCache(Coins);
+                    Log.v("tinyhhj" , "mCacheIsDirty : " +mCacheIsDirty);
                     if (mCachedCoins == null || mCacheIsDirty == true )
                     {
                         mCoinsLocalDataSource.getFavorCoins(new LoadCoinsCallback() {
                             @Override
                             public void onCoinsLoaded(List<Coin> coins) {
-                                for(Coin c : coins) {
-                                    Coin favorCoin = mCachedAllFavorCoins.get(c.getName() + c.getExchange().getName());
-                                    if(favorCoin != null)
-                                        favorCoin.setFavor(CoinsPersistenceContract.Favor.FAVOR);
-                                }
+                               refreshCache(coins);
                             }
 
                             @Override
@@ -199,11 +198,14 @@ public class CoinsRepository implements CoinsDataSource {
                             }
                         });
                     }
-                    //for test
-
-                    //mCachedAllFavorCoins.get("BTCokCoin").setFavor(CoinsPersistenceContract.Favor.FAVOR);
-                    //for test
+                    /* 관심코인을 setFavor함수로 체크 */
                     Log.v("tinyhhj" , "callback triggered");
+                    for(Coin c : mCachedCoins.values()) {
+                        Coin favorCoin = mCachedAllFavorCoins.get(c.getName() + c.getExchange().getName());
+                        Log.v("tinyhhj", "myfavor keys " + c.getName()+c.getExchange().getName());
+                        if(favorCoin != null)
+                            favorCoin.setFavor(CoinsPersistenceContract.Favor.FAVOR);
+                    }
                     callback.onCoinsLoaded(new ArrayList<Coin>(mCachedAllFavorCoins.values()));
                 }
 

@@ -21,11 +21,10 @@ public class FavorCoinListPresenter implements CurrencyContract.Presenter{
         mFragment = fragment;
         mFragment.setPresenter(this);
         mSource = repo;
-        mSource.removeFavorCoin("BTC","okCoin" );
-        mSource.removeFavorCoin("LTC","okCoin" );
     }
     @Override
     public void start() {
+        Log.v("tinyhhj" , "FavorCoinListPresenter start() mFirstLoad : " + mFirstLoad );
         loadAllFavorCoins(false||mFirstLoad , true);
     }
     private void loadAllFavorCoins(boolean forceUpdate , final boolean showLoadingUI)
@@ -76,6 +75,21 @@ public class FavorCoinListPresenter implements CurrencyContract.Presenter{
     @Override
     public void addNewFavorCoin(Coin c) {
         addNewFavorCoin(c.getName() , c.getExchange().getName());
+    }
+
+    @Override
+    public void refreshFavorCoinList() {
+        mSource.refreshCoins();
+    }
+
+    @Override
+    public void setSortType(CurrencyPresenter.SORT_TYPE st) {
+
+    }
+
+    @Override
+    public CurrencyPresenter.SORT_TYPE getSortType() {
+        return null;
     }
 
     @Override

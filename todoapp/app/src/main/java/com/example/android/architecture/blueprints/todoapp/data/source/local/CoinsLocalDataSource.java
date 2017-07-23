@@ -124,6 +124,7 @@ public class CoinsLocalDataSource implements CoinsDataSource {
                 String coinName = cur.getString(cur.getColumnIndexOrThrow(CoinsPersistenceContract.CoinEntry.COIN_NAME));
                 String coinExchangeName = cur.getString(cur.getColumnIndex(CoinsPersistenceContract.CoinEntry.COIN_EXCHANGE_NAME));
                 Coin coin =  new Coin(coinName, new Exchange(coinExchangeName));
+                coin.setFavor(CoinsPersistenceContract.Favor.FAVOR);
                 coins.add(coin);
             }
         }

@@ -22,12 +22,15 @@ public interface CurrencyContract {
         //For FavorCoinListFragment
         void showAllFavorExchanges(List<Coin> coins);
 
+
     }
 
     interface Presenter extends BasePresenter
     {
         //For CurrencyPresenter
         void changeFragment(int from , int to);
+        void setSortType(CurrencyPresenter.SORT_TYPE st);
+        CurrencyPresenter.SORT_TYPE getSortType();
 
 
         //For FavorCoinsListPresenter
@@ -35,6 +38,8 @@ public interface CurrencyContract {
         void removeFavorCoin(String coinName, String exName );
         void addNewFavorCoin(String coinName, String exName );
         void addNewFavorCoin(Coin c);
+        void refreshFavorCoinList();
+
     }
 
     interface CoinItemListener {

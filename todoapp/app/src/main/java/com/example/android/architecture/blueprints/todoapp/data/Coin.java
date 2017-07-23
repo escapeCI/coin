@@ -9,6 +9,7 @@ import com.example.android.architecture.blueprints.todoapp.data.source.local.Coi
  */
 
 public class Coin implements Comparable<Coin>{
+
     private String mName;
     private Exchange mExchange;
     private PriceInfo mPriceInfo;

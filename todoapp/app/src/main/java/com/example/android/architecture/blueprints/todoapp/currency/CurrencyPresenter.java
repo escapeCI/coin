@@ -6,6 +6,8 @@ import android.util.Log;
 import com.example.android.architecture.blueprints.todoapp.data.Coin;
 import com.example.android.architecture.blueprints.todoapp.data.source.CoinsDataSource;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -16,6 +18,17 @@ public class CurrencyPresenter implements CurrencyContract.Presenter {
     private CurrencyContract.View mFragment;
     private CoinsDataSource mSource;
     private boolean mFirstLoad = true;
+    private SORT_TYPE st =  SORT_TYPE.NONE;
+    public enum SORT_TYPE
+    {
+            NONE
+        ,   PRICE_ASC
+        ,   PRICE_DESC
+        ,   EXNAME_ASC
+        ,   EXNAME_DESC
+        ,   CNAME_ASC
+        ,   CNAME_DESC
+    }
 
     public CurrencyPresenter(CurrencyFragment fragment , CoinsDataSource repo)
     {
@@ -55,9 +68,7 @@ public class CurrencyPresenter implements CurrencyContract.Presenter {
                 }
                 else
                 {
-                    //show list
-                    for (Coin c : Coins)
-                        Log.v("tinyhhj" , "priceinfo : " +c.getPriceInfo().getCurPrice() + " " + c.getPriceInfo().getPrevPrice());
+                    sortCoins(Coins);
                     mFragment.showFavorCoins(Coins);
                 }
 
@@ -92,8 +103,50 @@ public class CurrencyPresenter implements CurrencyContract.Presenter {
     }
 
     @Override
+    public void refreshFavorCoinList() {
+
+    }
+
+    @Override
     public void addNewFavorCoin(String coinName, String exName) {
 
+    }
+
+    public void setSortType(SORT_TYPE st) {
+        this.st = st;
+        start();
+    }
+
+    @Override
+    public SORT_TYPE getSortType() {
+        return st;
+    }
+
+    private void sortCoins(List<Coin> lists)
+    {
+        Collections.sort(lists , new Comparator<Coin>() {
+            @Override
+            public int compare(Coin o1, Coin o2) {
+                switch(st)
+                {
+                    case PRICE_ASC:
+                        return (int) (o1.getPriceInfo().getCurPrice() - o2.getPriceInfo().getCurPrice());
+                    case PRICE_DESC:
+                        return (int) -(o1.getPriceInfo().getCurPrice() - o2.getPriceInfo().getCurPrice());
+                    case CNAME_ASC:
+                        return o1.getName().compareTo(o2.getName());
+                    case CNAME_DESC:
+                        return o2.getName().compareTo(o1.getName());
+                    case EXNAME_ASC:
+                        return o1.getExchange().getName().compareTo(o2.getExchange().getName());
+                    case EXNAME_DESC:
+                        return o2.getExchange().getName().compareTo(o1.getExchange().getName());
+                    default:
+                        return 0;
+                }
+
+            }
+        });
     }
 
 }

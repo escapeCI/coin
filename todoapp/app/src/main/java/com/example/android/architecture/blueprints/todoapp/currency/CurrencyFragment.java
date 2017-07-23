@@ -5,8 +5,12 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.widget.PopupMenu;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -64,6 +68,71 @@ public class CurrencyFragment extends Fragment implements CurrencyContract.View{
                 }
             }
         });
+        /* 메뉴목록을 보이게설정 */
+        setHasOptionsMenu(true);
+    }
+    void showSortTypePopUp() {
+        PopupMenu popup = new PopupMenu(getContext() , getActivity().findViewById(R.id.sort_type));
+        popup.getMenuInflater().inflate(R.menu.sort_type , popup.getMenu());
+
+        popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                switch(item.getItemId())
+                {
+                    case R.id.sort_coin_name:
+                        if(mPresenter.getSortType() == CurrencyPresenter.SORT_TYPE.CNAME_ASC)
+                        {
+                            mPresenter.setSortType(CurrencyPresenter.SORT_TYPE.CNAME_DESC);
+                        }
+                        else
+                        {
+                            mPresenter.setSortType(CurrencyPresenter.SORT_TYPE.CNAME_ASC);
+                        }
+                        break;
+                    case R.id.sort_ex_name:
+                        if( mPresenter.getSortType() == CurrencyPresenter.SORT_TYPE.EXNAME_ASC)
+                        {
+                            mPresenter.setSortType(CurrencyPresenter.SORT_TYPE.EXNAME_DESC);
+                        }
+                        else
+                        {
+                            mPresenter.setSortType(CurrencyPresenter.SORT_TYPE.EXNAME_ASC);
+                        }
+                        break;
+                    case R.id.sort_price:
+                        if(mPresenter.getSortType() == CurrencyPresenter.SORT_TYPE.PRICE_ASC)
+                        {
+                            mPresenter.setSortType(CurrencyPresenter.SORT_TYPE.PRICE_DESC);
+                        }
+                        else
+                        {
+                            mPresenter.setSortType(CurrencyPresenter.SORT_TYPE.PRICE_ASC);
+                        }
+                        break;
+                }
+                return true;
+            }
+        });
+        popup.show();
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.sort_type:
+                Log.v("tinyhhj" , "sort_type btn clicked");
+                showSortTypePopUp();
+                break;
+            default:
+                mPresenter.setSortType(CurrencyPresenter.SORT_TYPE.NONE);
+        }
+        return true;
+    }
+    /* 메뉴 목록을 만든다.*/
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.currency_fragment_menu, menu);
     }
 
     @Override
@@ -254,6 +323,8 @@ public class CurrencyFragment extends Fragment implements CurrencyContract.View{
 
             coinName.setText(coin.getName().toUpperCase());
             exchangeName.setText(coin.getExchange().getName());
+
+
 
             /* 숫자 1,000 형태의 String으로 변환 */
             DecimalFormat decimalFormat = new DecimalFormat("#,###");

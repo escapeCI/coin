@@ -20,8 +20,8 @@
     <dimen name="activity_vertical_margin">16dp</dimen>
 
     <dimen name="list_item_padding">8dp</dimen>
-    <dimen name="coin_font_size">12pt</dimen>
-    <dimen name="pric_font_size">11pt</dimen>
+    <dimen name="coin_font_size">10pt</dimen>
+    <dimen name="pric_font_size">10pt</dimen>
 
     <dimen name="fab_margin">16dp</dimen>
     <dimen name="nav_header_height">380dp</dimen>

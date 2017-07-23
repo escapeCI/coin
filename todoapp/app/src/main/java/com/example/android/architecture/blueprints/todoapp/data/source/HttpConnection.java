@@ -122,23 +122,29 @@ public class HttpConnection {
 //        jObj = response.getJSONObject("data");
 //        Iterator<String>
 //        for(int i = 0 ; i < jArray.length() ; i++) {
-            Log.v("tinyhhj" , ""+response.toString());
+            //Log.v("tinyhhj" , ""+response.toString());
             JSONObject exchangeInfo = response.getJSONObject("data");
-            Log.v("tinyhhj" , ""+exchangeInfo.toString());
+            double exchangeRate = response.getDouble("USDKRW");
+            //Log.v("tinyhhj" , ""+exchangeInfo.toString());
             Iterator<String> exchangeKeys = exchangeInfo.keys();
 
             while(exchangeKeys.hasNext()) {
                 String exchangeName = exchangeKeys.next();
                 JSONObject coinInfo = (JSONObject) exchangeInfo.get(exchangeName);
-                Log.v("tinyhhj" , ""+coinInfo.toString());
+                //Log.v("tinyhhj" , ""+coinInfo.toString());
                 Iterator<String> coinKeys = coinInfo.keys();
                 while(coinKeys.hasNext()) {
                     String coinName = coinKeys.next();
                     JSONObject priceInfo = (JSONObject) coinInfo.get(coinName);
-                    Log.v("tinyhhj" , ""+priceInfo.toString());
-
+                    //Log.v("tinyhhj" , ""+priceInfo.toString());
                     double curPrice = (double) Double.parseDouble((String)priceInfo.get(CUR_PRICE));
                     double prevPrice = (double) Double.parseDouble((String)priceInfo.get(PREV_PRICE));
+                    /* 현재 poloniex의 경우에 달러로 가격이 오므로 환율을 곱해줘서 원화로 표현 */
+                    if(exchangeName.compareTo("poloniex") == 0) {
+                        curPrice *= exchangeRate;
+                        prevPrice *= exchangeRate;
+                    }
+
                     Log.v("tinyhhj" , "" + coinName+exchangeName + " " + curPrice + " " + prevPrice);
 
                     Coin c = coins.get(coinName + exchangeName);

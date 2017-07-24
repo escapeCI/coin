@@ -15,6 +15,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -37,10 +38,10 @@ public class CurrencyFragment extends Fragment implements CurrencyContract.View{
     private CoinsAdapter mListAdapter;
     private Thread refreshThread;
     private final int refresh_period = 5000;    // 현재가 갱신 반복주기 (millisecond)
+    private LinearLayout coinLL;
+    private LinearLayout noCoinLL;
 
     public CurrencyFragment() {
-
-
     }
 
     public static CurrencyFragment newInstance() {
@@ -71,6 +72,7 @@ public class CurrencyFragment extends Fragment implements CurrencyContract.View{
         /* 메뉴목록을 보이게설정 */
         setHasOptionsMenu(true);
     }
+    /* 팝업메뉴목록 생성 및 버튼리스너 등록 */
     void showSortTypePopUp() {
         PopupMenu popup = new PopupMenu(getContext() , getActivity().findViewById(R.id.sort_type));
         popup.getMenuInflater().inflate(R.menu.sort_type , popup.getMenu());
@@ -217,6 +219,10 @@ public class CurrencyFragment extends Fragment implements CurrencyContract.View{
             }
         });
 
+        /* 관심코인 있을경우와 없을경우 리니어레이아웃 */
+        coinLL = (LinearLayout) root.findViewById(R.id.coinLL);
+        noCoinLL = (LinearLayout) root.findViewById(R.id.noCoinLL);
+
         //FlaotingAction button setup
 //        FloatingActionButton fab = (FloatingActionButton) getActivity().findViewById(R.id.fab);
 //        if (fab == null)
@@ -259,6 +265,8 @@ public class CurrencyFragment extends Fragment implements CurrencyContract.View{
     @Override
     public void showFavorCoins(List<Coin> coins) {
         mListAdapter.replaceData(coins);
+        coinLL.setVisibility(View.VISIBLE);
+        noCoinLL.setVisibility(View.GONE);
     }
 
     @Override
@@ -269,6 +277,14 @@ public class CurrencyFragment extends Fragment implements CurrencyContract.View{
     @Override
     public void showAllFavorFragment(int from , int to ) {
         ((CurrencyActivity)getActivity()).changeFragment(from ,to );
+    }
+
+    @Override
+    public void showNoFavorCoins() {
+        Log.v("tinyhhj" , "CurrencyFragment shownoFavorCoins");
+        coinLL.setVisibility(View.GONE);
+        noCoinLL.setVisibility(View.VISIBLE);
+
     }
 
 

@@ -81,6 +81,11 @@ public class FavorCoinListFragment extends Fragment
     }
 
     @Override
+    public void showNoFavorCoins() {
+
+    }
+
+    @Override
     public void setPresenter(CurrencyContract.Presenter presenter) {
         mPresenter = presenter;
     }

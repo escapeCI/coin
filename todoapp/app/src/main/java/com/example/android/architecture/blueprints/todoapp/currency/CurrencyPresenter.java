@@ -65,6 +65,7 @@ public class CurrencyPresenter implements CurrencyContract.Presenter {
                 if( Coins.isEmpty())
                 {
                     //empty view
+                    mFragment.showNoFavorCoins();
                 }
                 else
                 {
@@ -76,7 +77,12 @@ public class CurrencyPresenter implements CurrencyContract.Presenter {
 
             @Override
             public void onDataNotAvailable() {
-
+                if(!mFragment.isActive())
+                    return;
+                if(showLoadingUI)
+                    mFragment.setLoadingIndicator(false);
+                Log.v("tinyhhj","CurrencyPresenter getFavorCoins onDataNotAvailable");
+                mFragment.showNoFavorCoins();
             }
         });
 

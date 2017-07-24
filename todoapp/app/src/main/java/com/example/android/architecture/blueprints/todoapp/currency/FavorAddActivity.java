@@ -100,6 +100,11 @@ public class FavorAddActivity extends Activity implements CurrencyContract.View{
 
     }
 
+    @Override
+    public void showNoFavorCoins() {
+
+    }
+
     /*
     *  현재 현재가 조회 가능한 모든 목록들을 보여준다.
     */

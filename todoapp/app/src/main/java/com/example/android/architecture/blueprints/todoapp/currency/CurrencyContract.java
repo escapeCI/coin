@@ -19,6 +19,7 @@ public interface CurrencyContract {
         //For CurrencyFragment
         void showFavorCoins(List<Coin> coins);
         void showAllFavorFragment(int from , int to) ;
+        void showNoFavorCoins();
         //For FavorCoinListFragment
         void showAllFavorExchanges(List<Coin> coins);
 

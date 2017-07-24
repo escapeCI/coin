@@ -48,30 +48,23 @@ public class CoinsRepository implements CoinsDataSource {
             mCoinsLocalDataSource.getFavorCoins(new LoadCoinsCallback() {
                 @Override
                 public void onCoinsLoaded(List<Coin> coins) {
-
+                    Log.v("tinyhhj" , "CoinsRepository getFavorCoins onCoinsLoaded");
                     refreshCache(coins);
+                    // 가격정보 요청
+                    HttpConnection httpConnection = new HttpConnection( HttpConnection.url + "index.php" , "POST");
+                    httpConnection.requestPriceInfo(mCachedCoins , callback);
                    // callback.onCoinsLoaded(coins);
                 }
 
                 @Override
                 public void onDataNotAvailable()
                 {
-                    mCachedCoins = new LinkedHashMap<String , Coin>();
-                    ////////////////////////////////////////////////////////////////////////////////////////////
-                    //for test
-                    ////////////////////////////////////////////////////////////////////////////////////////////
-                    mCachedCoins.put("ETHbithumb" ,  new Coin("eth" ,new Exchange("bithumb")));
-                    mCachedCoins.put("BTCbithumb" ,  new Coin("btc" ,new Exchange("bithumb")));
-                    mCachedCoins.put("ETHcoinone" ,  new Coin("eth" ,new Exchange("coinone")));
-                    mCachedCoins.put("BTCcoinone" ,  new Coin("btc" ,new Exchange("coinone")));
-                    //callback.onDataNotAvailable();
+                    Log.v("tinyhhj" , "CoinsRepository getFavorCoins onDataNotAvailable");
+                    callback.onDataNotAvailable();
                 }
             });
         }
-        // 가격정보 요청
 
-        HttpConnection httpConnection = new HttpConnection( HttpConnection.url + "index.php" , "POST");
-        httpConnection.requestPriceInfo(mCachedCoins , callback);
 //        if(mCachedCoins.size() > 0 )
 //            callback.onCoinsLoaded(new ArrayList<>(mCachedCoins.values()));
 //        else
@@ -189,6 +182,14 @@ public class CoinsRepository implements CoinsDataSource {
                             @Override
                             public void onCoinsLoaded(List<Coin> coins) {
                                refreshCache(coins);
+                                /* 관심코인을 setFavor함수로 체크 */
+                                Log.v("tinyhhj" , "callback triggered");
+                                for(Coin c : mCachedCoins.values()) {
+                                    Coin favorCoin = mCachedAllFavorCoins.get(c.getName() + c.getExchange().getName());
+                                    Log.v("tinyhhj", "myfavor keys " + c.getName()+c.getExchange().getName());
+                                    if(favorCoin != null)
+                                        favorCoin.setFavor(CoinsPersistenceContract.Favor.FAVOR);
+                                }
                             }
 
                             @Override
@@ -198,14 +199,7 @@ public class CoinsRepository implements CoinsDataSource {
                             }
                         });
                     }
-                    /* 관심코인을 setFavor함수로 체크 */
-                    Log.v("tinyhhj" , "callback triggered");
-                    for(Coin c : mCachedCoins.values()) {
-                        Coin favorCoin = mCachedAllFavorCoins.get(c.getName() + c.getExchange().getName());
-                        Log.v("tinyhhj", "myfavor keys " + c.getName()+c.getExchange().getName());
-                        if(favorCoin != null)
-                            favorCoin.setFavor(CoinsPersistenceContract.Favor.FAVOR);
-                    }
+
                     callback.onCoinsLoaded(new ArrayList<Coin>(mCachedAllFavorCoins.values()));
                 }
 

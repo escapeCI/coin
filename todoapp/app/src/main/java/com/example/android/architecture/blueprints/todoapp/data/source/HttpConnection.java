@@ -308,9 +308,9 @@ public class HttpConnection {
                         {
 
                             String ask_order_price_key = ask_order_price.next();
-                            double ask_order_amount = Double.parseDouble(Double.toString(ask_order_info.getDouble(ask_order_price_key)));
+                            double ask_order_amount = (double)Math.round(ask_order_info.getDouble(ask_order_price_key)*10000)/10000;
                             double ask_price = Double.parseDouble(ask_order_price_key);
-                            Log.v("tinyhhj" , "ask_bid_order : " + ot +" "+ ask_order_price_key + " " + ask_order_amount + " " + ask_price);
+                            //Log.v("tinyhhj" , "ask_bid_order : " + ot +" "+ ask_order_price_key + " " + ask_order_amount + " " + ask_price);
                             list.add(new Order(ot , ask_order_amount , new PriceInfo(ask_price, ask_price) ));
                         }
                     }

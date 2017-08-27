@@ -4,6 +4,7 @@ import android.util.Log;
 
 import com.example.android.architecture.blueprints.todoapp.data.Coin;
 import com.example.android.architecture.blueprints.todoapp.data.Exchange;
+import com.example.android.architecture.blueprints.todoapp.data.Order;
 import com.example.android.architecture.blueprints.todoapp.data.PriceInfo;
 import com.example.android.architecture.blueprints.todoapp.data.source.local.CoinsPersistenceContract;
 
@@ -185,11 +186,12 @@ public class CoinsRepository implements CoinsDataSource {
     }
 
     @Override
-    public void getOrderInfos(Coin c) {
+    public void getOrderInfos(final Coin c , LoadDataCallback callback) {
         //string format get method
         String httpAddr = String.format("orderbook.php?xchg=%s&coin=%s",c.getExchange().getName() , c.getName());
         Log.v("tinyhhj" , "request order addr : " + httpAddr);
         HttpConnection httpConnection = new HttpConnection(HttpConnection.url + httpAddr,"GET");
+        httpConnection.requsetGetMethod(new ArrayList<Order>(0) , 0 , callback);
 
 
     }

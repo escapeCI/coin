@@ -14,6 +14,7 @@ import android.widget.RelativeLayout;
 
 import com.example.android.architecture.blueprints.todoapp.R;
 import com.example.android.architecture.blueprints.todoapp.data.Coin;
+import com.example.android.architecture.blueprints.todoapp.data.Order;
 import com.example.android.architecture.blueprints.todoapp.data.source.CoinsRepository;
 import com.example.android.architecture.blueprints.todoapp.data.source.HttpConnection;
 import com.example.android.architecture.blueprints.todoapp.data.source.local.CoinsLocalDataSource;
@@ -102,6 +103,11 @@ public class FavorAddActivity extends Activity implements CurrencyContract.View{
 
     @Override
     public void showNoFavorCoins() {
+
+    }
+
+    @Override
+    public void showOrderLists(List<Order> orders) {
 
     }
 

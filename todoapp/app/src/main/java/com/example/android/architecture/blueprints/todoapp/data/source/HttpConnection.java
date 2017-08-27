@@ -33,6 +33,7 @@ import java.util.Set;
 
 public class HttpConnection {
     public static final String url = "http://13.124.162.39/";
+    private static String rest_url ;
     private static final int CONN_TIMEOUT = 3;
     private static final int READ_TIMEOUT = 3;
     private CoinsDataSource.LoadCoinsCallback mCallback;
@@ -50,6 +51,8 @@ public class HttpConnection {
         this(url, method);
     }
     public HttpConnection(String baseAddr , String method) {
+        rest_url = baseAddr.substring(url.length() , baseAddr.length());
+        Log.v("tinyhhj" , "rest_url is " + rest_url);
         try {
             URL opener = new URL(baseAddr);
             Log.v("tinyhhj" , ""+ baseAddr + " " + method);
@@ -120,13 +123,17 @@ public class HttpConnection {
 
     private void updateResponse(Map<String , Coin> coins ,JSONObject response ) throws JSONException {
 
-
+        double exchangeRate;
 //        jObj = response.getJSONObject("data");
 //        Iterator<String>
 //        for(int i = 0 ; i < jArray.length() ; i++) {
             //Log.v("tinyhhj" , ""+response.toString());
+            // data JSONObject와 환율을 받아온다
             JSONObject exchangeInfo = response.getJSONObject("data");
-            double exchangeRate = response.getDouble("USDKRW");
+            if(!response.isNull("USDKRW"))
+                exchangeRate = response.getDouble("USDKRW");
+            else
+                exchangeRate = 1.0;
             //Log.v("tinyhhj" , ""+exchangeInfo.toString());
             Iterator<String> exchangeKeys = exchangeInfo.keys();
 
@@ -269,6 +276,7 @@ public class HttpConnection {
         //get order infos
         private void getOrderInfos(JSONObject order_info, List<Order> list ) throws JSONException {
             Iterator<String> keys = order_info.keys();
+            double exchangeRate = order_info.getDouble("USDKRW");
             while(keys.hasNext())
             {
                 String key = keys.next();
@@ -298,28 +306,27 @@ public class HttpConnection {
                         Iterator<String> ask_order_price = ask_order_info.keys();
                         while(ask_order_price.hasNext())
                         {
+
                             String ask_order_price_key = ask_order_price.next();
-                            double ask_order_amount = Double.parseDouble((String)ask_order_info.get(ask_order_price_key));
+                            double ask_order_amount = Double.parseDouble(Double.toString(ask_order_info.getDouble(ask_order_price_key)));
                             double ask_price = Double.parseDouble(ask_order_price_key);
+                            Log.v("tinyhhj" , "ask_bid_order : " + ot +" "+ ask_order_price_key + " " + ask_order_amount + " " + ask_price);
                             list.add(new Order(ot , ask_order_amount , new PriceInfo(ask_price, ask_price) ));
                         }
                     }
                 }
-                else if(key.compareTo("USDKRW") == 0)
-                {
-
-                }
                 else
                 {
-
+                    Log.v("tinyhhj" , "JSONObject response key : " + key);
                 }
 
             }
         }
-        public void requsetGetMethod(final Object o , final int ver, final CoinsDataSource.LoadCoinsCallback callback)
+        public void requsetGetMethod(final Object o , final int ver, final CoinsDataSource.LoadDataCallback callback)
         {
             new AsyncTask<Void , Void , Void> () {
-
+                int status = 0 ;
+                List<Order> orders ;
                 @Override
                 protected Void doInBackground(Void... voids) {
                     try {
@@ -341,19 +348,35 @@ public class HttpConnection {
                             switch(ver)
                             {
                                 case 0 :
-                                    List<Order> orders = (List<Order>)o;
+                                    orders = (List<Order>)o;
                                     getOrderInfos( new JSONObject(resp) , orders );
-
-
                             }
 
                         }
                     } catch (IOException e) {
                         e.printStackTrace();
+                        status = -1;
                     } catch (JSONException e) {
                         e.printStackTrace();
+                        status = -2;
+                    } catch (Exception e)
+                    {
+                        e.printStackTrace();
+                        status= -999;
                     }
                     return null;
+                }
+
+
+                protected void onPostExecute(Void aVoid)
+                {
+                    super.onPostExecute(aVoid);
+                    if(status == 0 )
+                        callback.onDataLoaded( orders );
+                    else
+                        callback.noDataAvailable();
+
+                    Log.v("tinyhhj" , "end");
                 }
             }.execute();
         }

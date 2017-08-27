@@ -1,10 +1,12 @@
 package com.example.android.architecture.blueprints.todoapp.currency;
 
 import android.app.Dialog;
+import android.content.DialogInterface;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.PopupMenu;
@@ -25,6 +27,7 @@ import android.widget.Toast;
 import com.example.android.architecture.blueprints.todoapp.R;
 import com.example.android.architecture.blueprints.todoapp.data.Coin;
 import com.example.android.architecture.blueprints.todoapp.data.Order;
+import com.example.android.architecture.blueprints.todoapp.data.source.CoinsDataSource;
 import com.example.android.architecture.blueprints.todoapp.tasks.ScrollChildSwipeRefreshLayout;
 
 import java.text.DecimalFormat;
@@ -269,7 +272,27 @@ public class CurrencyFragment extends Fragment implements CurrencyContract.View{
         mDialog = new Dialog(getActivity());
         mDialog.setContentView(R.layout.dialog_popup);
         ListView dlv = (ListView) mDialog.findViewById(R.id.popup_listview);
+        Log.v("tinyhhj" , "dialog : " + dlv);
         dlv.setAdapter(mOrderAdapter);
+
+        //dialog showlistener 등록
+        mDialog.setOnShowListener(new DialogInterface.OnShowListener() {
+            @Override
+            public void onShow(DialogInterface dialogInterface) {
+                // dialog로는 activity focus가 이동되지 않기때문에 onPause가 트리거 되지 않는다
+                // 따라서 dialog가 나타날때 적용하고 싶은 onPause기능을 리스너로 구동
+                refreshThread.interrupt();
+            }
+        });
+        mDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialogInterface) {
+                //dialog에 다녀오면 thread 동작이 멈춰 onResume이 트리거 되기전까지 작동 X
+                //dismiss 될때 임의로 작동시켜준다
+                refreshThread.start();
+            }
+        });
+
 
         return root;
     }
@@ -315,6 +338,15 @@ public class CurrencyFragment extends Fragment implements CurrencyContract.View{
         noCoinLL.setVisibility(View.VISIBLE);
 
     }
+
+    @Override
+    public void showOrderLists(List<Order> orders) {
+        for (Order o : orders)
+            Log.v("tinyhhj" , "orders before adapter : " + o.getOrder_amount() + o.getOrder_price().getCurPrice() + o.getOrder_type());
+        mOrderAdapter.replaceData(orders);
+        mDialog.show();
+    }
+
     //order list adapter
     private static class OrdersAdapter extends BaseAdapter {
         private List<Order> orders;
@@ -322,6 +354,12 @@ public class CurrencyFragment extends Fragment implements CurrencyContract.View{
         public OrdersAdapter( List<Order> orders)
         {
             this.orders = orders;
+        }
+
+        public void replaceData(List<Order> lists)
+        {
+            orders = lists;
+            notifyDataSetChanged();
         }
 
         @Override
@@ -353,10 +391,11 @@ public class CurrencyFragment extends Fragment implements CurrencyContract.View{
             TextView order_type = (TextView) rowView.findViewById(R.id.order_item_name);
             TextView order_price = (TextView) rowView.findViewById(R.id.order_item_price);
             TextView order_amount = (TextView) rowView.findViewById(R.id.order_item_amount);
-
+            Log.v("tinyhhj" , "odrer adapter : (" + i + ") " + o.getOrder_type() + " " + o.getOrder_price().getCurPrice() + " " + o.getOrder_amount() );
             order_type.setText(o.getOrder_type() == Order.Order_type.BID ? "구매" : "판매");
             order_price.setText(new DecimalFormat("#,###").format((int)o.getOrder_price().getCurPrice()));
             order_amount.setText(Double.toString(o.getOrder_amount()));
+            Log.v("tinyhhj" , "ooottt" + order_type.getText() + order_price.getText() + order_amount.getText());
             int color;
             if(o.getOrder_type() == Order.Order_type.BID)
             {

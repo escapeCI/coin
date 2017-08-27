@@ -12,6 +12,12 @@ import java.util.List;
 
 public interface CoinsDataSource {
 
+    interface LoadDataCallback<T> {
+        void onDataLoaded (List<T> list);
+        void noDataAvailable();
+        void onDataError();
+    }
+
 
     interface LoadCoinsCallback {
 
@@ -44,7 +50,7 @@ public interface CoinsDataSource {
     //For CurrencyPresenter
     void refreshCoins();
     void getFavorCoins(LoadCoinsCallback callback);
-    void getOrderInfos(Coin c);
+    void getOrderInfos(Coin c , LoadDataCallback callback);
 
     //For FavorCoinListPresenter
     void getAllFavorCoins(LoadCoinsCallback callback);

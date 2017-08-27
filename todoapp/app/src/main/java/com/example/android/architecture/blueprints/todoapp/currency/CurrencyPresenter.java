@@ -4,6 +4,7 @@ import android.support.v4.app.Fragment;
 import android.util.Log;
 
 import com.example.android.architecture.blueprints.todoapp.data.Coin;
+import com.example.android.architecture.blueprints.todoapp.data.Order;
 import com.example.android.architecture.blueprints.todoapp.data.source.CoinsDataSource;
 
 import java.util.Collections;
@@ -139,7 +140,22 @@ public class CurrencyPresenter implements CurrencyContract.Presenter {
     @Override
     public void getOrderInfo(Coin c) {
         // request order info to model
-        mSource.getOrderInfos(c);
+        mSource.getOrderInfos(c , new CoinsDataSource.LoadDataCallback<Order>() {
+            @Override
+            public void onDataLoaded(List<Order> list) {
+                mFragment.showOrderLists(list);
+            }
+
+            @Override
+            public void noDataAvailable() {
+
+            }
+
+            @Override
+            public void onDataError() {
+
+            }
+        });
     }
 
     private void sortCoins(List<Coin> lists)

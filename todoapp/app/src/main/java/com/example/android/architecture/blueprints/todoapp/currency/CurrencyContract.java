@@ -3,6 +3,8 @@ package com.example.android.architecture.blueprints.todoapp.currency;
 import com.example.android.architecture.blueprints.todoapp.BasePresenter;
 import com.example.android.architecture.blueprints.todoapp.BaseView;
 import com.example.android.architecture.blueprints.todoapp.data.Coin;
+import com.example.android.architecture.blueprints.todoapp.data.Order;
+import com.example.android.architecture.blueprints.todoapp.data.source.CoinsDataSource;
 
 import java.util.List;
 
@@ -20,6 +22,7 @@ public interface CurrencyContract {
         void showFavorCoins(List<Coin> coins);
         void showAllFavorFragment(int from , int to) ;
         void showNoFavorCoins();
+        void showOrderLists(List<Order> orders);
         //For FavorCoinListFragment
         void showAllFavorExchanges(List<Coin> coins);
 
@@ -32,7 +35,7 @@ public interface CurrencyContract {
         void changeFragment(int from , int to);
         void setSortType(CurrencyPresenter.SORT_TYPE st);
         CurrencyPresenter.SORT_TYPE getSortType();
-        void getOrderInfo(Coin c);
+        void getOrderInfo(Coin c );
 
 
         //For FavorCoinsListPresenter

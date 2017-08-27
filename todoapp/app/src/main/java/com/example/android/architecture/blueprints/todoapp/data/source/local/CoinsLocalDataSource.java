@@ -145,9 +145,10 @@ public class CoinsLocalDataSource implements CoinsDataSource {
     }
 
     @Override
-    public void getOrderInfos(Coin c) {
+    public void getOrderInfos(Coin c, LoadDataCallback callback) {
 
     }
+
 
     @Override
     public void getAllFavorCoins(LoadCoinsCallback callback) {

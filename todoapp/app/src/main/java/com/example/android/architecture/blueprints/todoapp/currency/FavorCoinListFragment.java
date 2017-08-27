@@ -13,6 +13,7 @@ import android.widget.TextView;
 
 import com.example.android.architecture.blueprints.todoapp.R;
 import com.example.android.architecture.blueprints.todoapp.data.Coin;
+import com.example.android.architecture.blueprints.todoapp.data.Order;
 import com.example.android.architecture.blueprints.todoapp.data.source.local.CoinsPersistenceContract;
 import com.example.android.architecture.blueprints.todoapp.tasks.ScrollChildSwipeRefreshLayout;
 
@@ -82,6 +83,11 @@ public class FavorCoinListFragment extends Fragment
 
     @Override
     public void showNoFavorCoins() {
+
+    }
+
+    @Override
+    public void showOrderLists(List<Order> orders) {
 
     }
 

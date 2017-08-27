@@ -4,6 +4,7 @@ import android.util.Log;
 
 import com.example.android.architecture.blueprints.todoapp.data.Coin;
 import com.example.android.architecture.blueprints.todoapp.data.Exchange;
+import com.example.android.architecture.blueprints.todoapp.data.PriceInfo;
 import com.example.android.architecture.blueprints.todoapp.data.source.local.CoinsPersistenceContract;
 
 import java.net.HttpURLConnection;
@@ -62,7 +63,18 @@ public class CoinsRepository implements CoinsDataSource {
                     Log.v("tinyhhj" , "CoinsRepository getFavorCoins onDataNotAvailable");
                     callback.onDataNotAvailable();
                 }
+
+                @Override
+                public void onError() {
+
+                }
             });
+        }
+        // cache coin return
+        else
+        {
+            HttpConnection httpConnection = new HttpConnection( HttpConnection.url + "index.php" , "POST");
+            httpConnection.requestPriceInfo(mCachedCoins , callback);
         }
 
 //        if(mCachedCoins.size() > 0 )
@@ -127,7 +139,12 @@ public class CoinsRepository implements CoinsDataSource {
                 mCoinsLocalDataSource.saveNewFavorCoin(coinName, exName);
 
             }
-        });
+
+             @Override
+             public void onError() {
+
+             }
+         });
         refreshCoins();
     }
 
@@ -141,6 +158,11 @@ public class CoinsRepository implements CoinsDataSource {
 
             @Override
             public void onDataNotAvailable() {
+
+            }
+
+            @Override
+            public void onError() {
 
             }
         });
@@ -163,6 +185,16 @@ public class CoinsRepository implements CoinsDataSource {
     }
 
     @Override
+    public void getOrderInfos(Coin c) {
+        //string format get method
+        String httpAddr = String.format("orderbook.php?xchg=%s&coin=%s",c.getExchange().getName() , c.getName());
+        Log.v("tinyhhj" , "request order addr : " + httpAddr);
+        HttpConnection httpConnection = new HttpConnection(HttpConnection.url + httpAddr,"GET");
+
+
+    }
+
+    @Override
     public void getAllFavorCoins(final LoadCoinsCallback callback) {
         if( mAllFavorCacheIsDirty || mCachedAllFavorCoins == null)
         {
@@ -174,22 +206,16 @@ public class CoinsRepository implements CoinsDataSource {
                 public void onCoinsLoaded(List<Coin> Coins) {
                     for(Coin c : Coins)
                         Log.v("tinyhhj", "keys " + c.getName()+c.getExchange().getName());
-                    refreshAllFavorCache(Coins);
+
                     Log.v("tinyhhj" , "mCacheIsDirty : " +mCacheIsDirty);
+                    // 관심코인이 없을경우 로드
                     if (mCachedCoins == null || mCacheIsDirty == true )
                     {
                         mCoinsLocalDataSource.getFavorCoins(new LoadCoinsCallback() {
                             @Override
                             public void onCoinsLoaded(List<Coin> coins) {
-                               refreshCache(coins);
-                                /* 관심코인을 setFavor함수로 체크 */
-                                Log.v("tinyhhj" , "callback triggered");
-                                for(Coin c : mCachedCoins.values()) {
-                                    Coin favorCoin = mCachedAllFavorCoins.get(c.getName() + c.getExchange().getName());
-                                    Log.v("tinyhhj", "myfavor keys " + c.getName()+c.getExchange().getName());
-                                    if(favorCoin != null)
-                                        favorCoin.setFavor(CoinsPersistenceContract.Favor.FAVOR);
-                                }
+                                refreshCache(coins);
+
                             }
 
                             @Override
@@ -197,15 +223,41 @@ public class CoinsRepository implements CoinsDataSource {
                             {
 
                             }
+
+                            @Override
+                            public void onError() {
+
+                            }
                         });
                     }
 
+                    //관심코인이 로드 되었다면 Favor로 세팅
+                    if( !mCacheIsDirty)
+                    {
+                        //전체 리스트중 관심코인을 체크하여 favor 값을 세팅해준다.
+                        for (Coin c : mCachedCoins.values())
+                        {
+                            for ( Coin cc : Coins ) {
+                                if (c.compareTo(cc) == 0 && c.getName().compareTo(cc.getName()) == 0)
+                                {
+                                    cc.setFavor(CoinsPersistenceContract.Favor.FAVOR);
+                                }
+                            }
+                        }
+                    }
+
+                    refreshAllFavorCache(Coins);
                     callback.onCoinsLoaded(new ArrayList<Coin>(mCachedAllFavorCoins.values()));
                 }
 
                 @Override
                 public void onDataNotAvailable() {
                     //목록조회 불가능할때 정의
+                }
+
+                @Override
+                public void onError() {
+
                 }
             });
 

@@ -84,6 +84,14 @@ public class CurrencyPresenter implements CurrencyContract.Presenter {
                 Log.v("tinyhhj","CurrencyPresenter getFavorCoins onDataNotAvailable");
                 mFragment.showNoFavorCoins();
             }
+
+            @Override
+            public void onError() {
+                // 관심코인을 로드하는데 에러났으므로 다음번에 로드할때는 새로 로드하게끔
+                // 캐시값을 지워준다.
+                //mSource.refreshCoins();
+
+            }
         });
 
     }
@@ -126,6 +134,12 @@ public class CurrencyPresenter implements CurrencyContract.Presenter {
     @Override
     public SORT_TYPE getSortType() {
         return st;
+    }
+
+    @Override
+    public void getOrderInfo(Coin c) {
+        // request order info to model
+        mSource.getOrderInfos(c);
     }
 
     private void sortCoins(List<Coin> lists)

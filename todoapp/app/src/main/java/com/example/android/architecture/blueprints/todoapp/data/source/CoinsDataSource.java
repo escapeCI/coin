@@ -18,6 +18,8 @@ public interface CoinsDataSource {
         void onCoinsLoaded(List<Coin> Coins);
 
         void onDataNotAvailable();
+
+        void onError();
     }
 
     interface GetCoinCallback {
@@ -25,6 +27,8 @@ public interface CoinsDataSource {
         void onCoinLoaded(Coin coin);
 
         void onDataNotAvailable();
+
+        void onError();
     }
 
     void getCoins(LoadCoinsCallback callback );
@@ -40,6 +44,7 @@ public interface CoinsDataSource {
     //For CurrencyPresenter
     void refreshCoins();
     void getFavorCoins(LoadCoinsCallback callback);
+    void getOrderInfos(Coin c);
 
     //For FavorCoinListPresenter
     void getAllFavorCoins(LoadCoinsCallback callback);

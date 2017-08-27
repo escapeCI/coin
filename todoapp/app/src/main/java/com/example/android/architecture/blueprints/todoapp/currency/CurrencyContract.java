@@ -32,6 +32,7 @@ public interface CurrencyContract {
         void changeFragment(int from , int to);
         void setSortType(CurrencyPresenter.SORT_TYPE st);
         CurrencyPresenter.SORT_TYPE getSortType();
+        void getOrderInfo(Coin c);
 
 
         //For FavorCoinsListPresenter

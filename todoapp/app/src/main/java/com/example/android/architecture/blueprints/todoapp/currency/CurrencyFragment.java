@@ -1,7 +1,9 @@
 package com.example.android.architecture.blueprints.todoapp.currency;
 
+import android.app.Dialog;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -22,12 +24,14 @@ import android.widget.Toast;
 
 import com.example.android.architecture.blueprints.todoapp.R;
 import com.example.android.architecture.blueprints.todoapp.data.Coin;
+import com.example.android.architecture.blueprints.todoapp.data.Order;
 import com.example.android.architecture.blueprints.todoapp.tasks.ScrollChildSwipeRefreshLayout;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.RunnableFuture;
 
 /**
  * Created by tinyhhj on 2017-06-19.
@@ -40,6 +44,9 @@ public class CurrencyFragment extends Fragment implements CurrencyContract.View{
     private final int refresh_period = 5000;    // 현재가 갱신 반복주기 (millisecond)
     private LinearLayout coinLL;
     private LinearLayout noCoinLL;
+    private Dialog mDialog;
+    private Handler handler;
+    private OrdersAdapter mOrderAdapter;
 
     public CurrencyFragment() {
     }
@@ -52,23 +59,26 @@ public class CurrencyFragment extends Fragment implements CurrencyContract.View{
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        mListAdapter = new CoinsAdapter(new ArrayList<Coin>(0) , null);
+        mListAdapter = new CoinsAdapter(new ArrayList<Coin>(0) , itemClickListener);
         Toast.makeText(getActivity() , "CurrencyFragment onCreate()",Toast.LENGTH_SHORT).show();
+        handler = new Handler();
+        mOrderAdapter = new OrdersAdapter(new ArrayList<Order>(0));
 
-        /* 5초마다 현재가 갱신 쓰레드 */
-        refreshThread = new Thread(new Runnable(){
-            @Override
-            public void run(){
-                while(!refreshThread.isInterrupted()){
-                    mPresenter.start();
-                    try {
-                        Thread.sleep(refresh_period);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        });
+
+//        /* 5초마다 현재가 갱신 쓰레드 */
+//        refreshThread = new Thread(new Runnable(){
+//            @Override
+//            public void run(){
+//                while(!refreshThread.isInterrupted()){
+//                    mPresenter.start();
+//                    try {
+//                        Thread.sleep(refresh_period);
+//                    } catch (InterruptedException e) {
+//                        e.printStackTrace();
+//                    }
+//                }
+//            }
+//        });
         /* 메뉴목록을 보이게설정 */
         setHasOptionsMenu(true);
     }
@@ -143,31 +153,45 @@ public class CurrencyFragment extends Fragment implements CurrencyContract.View{
         Log.v("tinyhhj","### CurrencyFragment onResume() triggered! ###");
         mPresenter.start();
 
-//       2017-07-12 : 현재가 스레드 임시 주석처리
-//        /* 5초마다 현재가 갱신 */
-//        refreshThread = new Thread(new Runnable(){
-//           @Override
-//            public void run(){
-//               while(true){
-//                   mPresenter.start();
-//                   try {
-//                       Thread.sleep(refresh_period);
-//                   } catch (InterruptedException e) {
-//                       e.printStackTrace();
-//                       break;
-//                   }
-//
-//               }
-//
-//           }
-//        });
-//        refreshThread.start();
+        if( refreshThread == null) {
+            Log.v("tinyhhj" ,"refreshThread is null ");
+            refreshThread = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    Log.v("tinyhhj" ,"refreshThread is start ");
+                    while(true)
+                    {
+                        handler.post(new Runnable() {
+
+                            @Override
+                            public void run() {
+                                mPresenter.start();
+                            }
+                        });
+
+                        try {
+                            Thread.sleep(refresh_period);
+                        }
+                        catch(InterruptedException e)
+                        {
+                            e.printStackTrace();
+                            Log.v("tinyhhj" ,"refreshThread end ");
+                            break;
+                        }
+                    }
+                }
+            });
+        }
+        refreshThread.start();
+
         Toast.makeText(getActivity() , "CurrencyFragment onResume()",Toast.LENGTH_SHORT).show();
     }
 
     @Override
     public void onPause() {
         super.onPause();
+        refreshThread.interrupt();
+
     }
 
     @Override
@@ -177,7 +201,6 @@ public class CurrencyFragment extends Fragment implements CurrencyContract.View{
         Log.v("tinyhhj","### CurrencyFragment onStop() triggered! ###");
         Toast.makeText(getActivity() , "CurrencyFragment onStop()",Toast.LENGTH_SHORT).show();
         /* 화면 stop상태에서 현재가 갱신 쓰레드 인터럽트 */
-//        refreshThread.interrupt();
 
 //       2017-07-12 : 현재가 스레드 임시 주석처리
 //        Log.i("seongenie", "Thread Stop");
@@ -242,6 +265,12 @@ public class CurrencyFragment extends Fragment implements CurrencyContract.View{
 //            }
 //        }) ;
 
+        //Dialog 생성
+        mDialog = new Dialog(getActivity());
+        mDialog.setContentView(R.layout.dialog_popup);
+        ListView dlv = (ListView) mDialog.findViewById(R.id.popup_listview);
+        dlv.setAdapter(mOrderAdapter);
+
         return root;
     }
 
@@ -286,8 +315,65 @@ public class CurrencyFragment extends Fragment implements CurrencyContract.View{
         noCoinLL.setVisibility(View.VISIBLE);
 
     }
+    //order list adapter
+    private static class OrdersAdapter extends BaseAdapter {
+        private List<Order> orders;
 
+        public OrdersAdapter( List<Order> orders)
+        {
+            this.orders = orders;
+        }
 
+        @Override
+        public int getCount() {
+            return orders == null? 0 : orders.size();
+        }
+
+        @Override
+        public Object getItem(int i) {
+            return orders.get(i);
+        }
+
+        @Override
+        public long getItemId(int i) {
+            return i;
+        }
+
+        @Override
+        public View getView(int i, View view, ViewGroup viewGroup) {
+            View rowView = view;
+            if(view == null)
+            {
+                LayoutInflater inflater = LayoutInflater.from(viewGroup.getContext());
+                rowView = inflater.inflate(R.layout.order_item , viewGroup , false);
+            }
+
+            Order o = (Order) getItem(i);
+
+            TextView order_type = (TextView) rowView.findViewById(R.id.order_item_name);
+            TextView order_price = (TextView) rowView.findViewById(R.id.order_item_price);
+            TextView order_amount = (TextView) rowView.findViewById(R.id.order_item_amount);
+
+            order_type.setText(o.getOrder_type() == Order.Order_type.BID ? "구매" : "판매");
+            order_price.setText(new DecimalFormat("#,###").format((int)o.getOrder_price().getCurPrice()));
+            order_amount.setText(Double.toString(o.getOrder_amount()));
+            int color;
+            if(o.getOrder_type() == Order.Order_type.BID)
+            {
+                color = Color.RED;
+            }
+            else
+            {
+                color = Color.BLUE;
+            }
+            order_type.setTextColor(color);
+            order_price.setTextColor(color);
+            order_amount.setTextColor(color);
+
+            return rowView;
+        }
+    }
+    //FavorCoin List adapter
     private static class CoinsAdapter extends BaseAdapter{
         private List<Coin> mCoins;
         private CurrencyContract.CoinItemListener mItemListener;
@@ -363,9 +449,24 @@ public class CurrencyFragment extends Fragment implements CurrencyContract.View{
             diffRate.setText(String.valueOf(rate) + "%");
 
             //click listener
+            rowView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    mItemListener.onCoinClick(coin);
+                }
+            });
             return rowView;
         }
     }
+
+    CurrencyContract.CoinItemListener itemClickListener = new CurrencyContract.CoinItemListener() {
+        @Override
+        public void onCoinClick(Coin c) {
+            // get Data
+            mPresenter.getOrderInfo(c);
+            // inflate data on listView
+        }
+    };
 
 
 }

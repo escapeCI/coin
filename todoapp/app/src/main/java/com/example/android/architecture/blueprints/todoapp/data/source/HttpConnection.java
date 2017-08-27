@@ -5,6 +5,7 @@ import android.util.Log;
 
 import com.example.android.architecture.blueprints.todoapp.data.Coin;
 import com.example.android.architecture.blueprints.todoapp.data.Exchange;
+import com.example.android.architecture.blueprints.todoapp.data.Order;
 import com.example.android.architecture.blueprints.todoapp.data.PriceInfo;
 
 import org.json.JSONArray;
@@ -35,6 +36,7 @@ public class HttpConnection {
     private static final int CONN_TIMEOUT = 3;
     private static final int READ_TIMEOUT = 3;
     private CoinsDataSource.LoadCoinsCallback mCallback;
+    private static final int ORDER_INFO_COUNT = 5;
 
     //For priceInfo JSONObject Keys
     public static final String CUR_PRICE = "last_price";
@@ -161,6 +163,7 @@ public class HttpConnection {
             //json 형태로 파싱
             new AsyncTask<Void, Void,Void>() {
                 JSONObject obj;
+                int status = 0;
                 protected void onPreExecute() {
                     super.onPreExecute();
                 }
@@ -180,6 +183,7 @@ public class HttpConnection {
                     } catch (Exception e) {
                         Log.v("tinyhhj" , "exception occur!");
                         e.printStackTrace();
+                        status = -1;
                     }
 
 
@@ -193,6 +197,7 @@ public class HttpConnection {
                         mCallback.onCoinsLoaded(new ArrayList<>(coins.values()));
                     else
                         mCallback.onDataNotAvailable();
+
                     Log.v("tinyhhj" , "end");
                 }
 
@@ -259,6 +264,98 @@ public class HttpConnection {
                 }
             }.execute();
 
+        }
+
+        //get order infos
+        private void getOrderInfos(JSONObject order_info, List<Order> list ) throws JSONException {
+            Iterator<String> keys = order_info.keys();
+            while(keys.hasNext())
+            {
+                String key = keys.next();
+                if( key.compareTo("data") == 0)
+                {
+                    JSONObject infos = order_info.getJSONObject(key);
+                    Iterator<String> order_type = infos.keys();
+                    while(order_type.hasNext())
+                    {
+                        String order_type_key = order_type.next();
+                        Order.Order_type ot ;
+                        if( order_type_key.compareTo("ASK") == 0)
+                        {
+                            ot = Order.Order_type.ASK;
+
+                        }
+                        else if(order_type_key.compareTo("BID") == 0)
+                        {
+                            ot = Order.Order_type.BID;
+                        }
+                        else
+                        {
+                            Log.v("tinyhhj", "### error with orde_type_key :" + order_type_key + " ###" );
+                            return;
+                        }
+                        JSONObject ask_order_info = infos.getJSONObject(order_type_key);
+                        Iterator<String> ask_order_price = ask_order_info.keys();
+                        while(ask_order_price.hasNext())
+                        {
+                            String ask_order_price_key = ask_order_price.next();
+                            double ask_order_amount = Double.parseDouble((String)ask_order_info.get(ask_order_price_key));
+                            double ask_price = Double.parseDouble(ask_order_price_key);
+                            list.add(new Order(ot , ask_order_amount , new PriceInfo(ask_price, ask_price) ));
+                        }
+                    }
+                }
+                else if(key.compareTo("USDKRW") == 0)
+                {
+
+                }
+                else
+                {
+
+                }
+
+            }
+        }
+        public void requsetGetMethod(final Object o , final int ver, final CoinsDataSource.LoadCoinsCallback callback)
+        {
+            new AsyncTask<Void , Void , Void> () {
+
+                @Override
+                protected Void doInBackground(Void... voids) {
+                    try {
+                        is = conn.getInputStream();
+                        if( conn.getResponseCode() == HttpURLConnection.HTTP_OK)
+                        {
+                            baos = new ByteArrayOutputStream();
+                            byte[] buf = new byte[1024];
+                            byte[] data;
+                            int nLength;
+                            while ((nLength = is.read(buf , 0 , buf.length)) != -1)
+                            {
+                                baos.write(buf, 0 , nLength);
+                            }
+                            data = baos.toByteArray();
+                            String resp = new String(data);
+                            Log.v("tinyhhj" , "Response"+resp);
+
+                            switch(ver)
+                            {
+                                case 0 :
+                                    List<Order> orders = (List<Order>)o;
+                                    getOrderInfos( new JSONObject(resp) , orders );
+
+
+                            }
+
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    return null;
+                }
+            }.execute();
         }
 
 }

@@ -54,6 +54,11 @@ public class FavorCoinListPresenter implements CurrencyContract.Presenter{
             public void onDataNotAvailable() {
                 Log.v("tinyhhj", ""+"onDataNotAvailable");
             }
+
+            @Override
+            public void onError() {
+
+            }
         });
     }
 
@@ -90,6 +95,11 @@ public class FavorCoinListPresenter implements CurrencyContract.Presenter{
     @Override
     public CurrencyPresenter.SORT_TYPE getSortType() {
         return null;
+    }
+
+    @Override
+    public void getOrderInfo(Coin c) {
+
     }
 
     @Override

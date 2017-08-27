@@ -123,8 +123,8 @@ public class FavorAddActivity extends Activity implements CurrencyContract.View{
 
         for ( int i = 0 ; i < coins.size() ; i++)
         {
-            for (Coin c : coins)
-                Log.v("tinyhhj" , "allfavorlist :" +  c.getName()+c.getExchange().getName()+ " " + c.getFavor());
+                //for (Coin c : coins)
+                //Log.v("tinyhhj" , "allfavorlist :" +  c.getName()+c.getExchange().getName()+ " " + c.getFavor());
             /* 새로운 거래소라면 거래소 버튼 생성*/
             if( set.add(coins.get(i).getExchange().getName()) )
             {

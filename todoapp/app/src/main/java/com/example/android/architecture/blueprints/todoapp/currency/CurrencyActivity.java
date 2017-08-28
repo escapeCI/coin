@@ -30,6 +30,7 @@ public class CurrencyActivity extends AppCompatActivity  implements CurrencyCont
     //Fragment id
     public static final int MY_FAVOR_COIN_FRAGMENT =  0;
     public static final int ALL_FAVOR_COIN_FRAGMENT = 1;
+    public static final int test = 44;
 
     private static final String CURRENT_TAB_NO = "CURRENT_TAB_NO";
     private static final int MAX_NUM_FRAGMENTS = 3;
